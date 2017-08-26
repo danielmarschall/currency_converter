@@ -8,6 +8,8 @@
 
 <h1>ViaThinkSoft Currency Converter - DLL specification</h1>
 
+<p><i>Last change: 26.08.2017</i></p>
+
 <h2>Table of Contents</h2>
 
 <p>These functions are exported by <b>CurConv.dll</b>:</p>
@@ -125,8 +127,8 @@ function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer; Flags:
 </pre>
 <h4>C</h5>
 <pre>
-Double __stdcall ConvertW(Double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, DWORD Flags, DATE HistoricDate);
-Double __stdcall ConvertA(Double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge; DWORD Flags, DATE HistoricDate);
+float __stdcall ConvertW(float Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+float __stdcall ConvertA(float Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
 <h3>Description</h4>
@@ -172,9 +174,8 @@ function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConv
 </pre>
 <h4>C</h5>
 <pre>
-int __stdcall AcceptedCurrencies(LPTSTR WriteTo, int MaxAge, DWORD Flags, DATE HistoricDate);
-int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, DWORD Flags, DATE HistoricDate);
-int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, DWORD Flags, DATE HistoricDate);
+int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
 <h3>Description</h4>
@@ -216,7 +217,7 @@ function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; std
 </pre>
 <h4>C</h5>
 <pre>
-HRESULT __stdcall DownloadNow(DWORD Flags, DATE HistoricDate);
+HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
 <h3>Description</h4>

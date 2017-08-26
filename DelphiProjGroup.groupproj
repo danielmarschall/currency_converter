@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{A2761CB4-70F5-45ED-85FE-60F3C127D634}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="DLL\CurConv.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="DLL Usage Demo\Delphi\CurConvDLLDemo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CurConv">
+        <MSBuild Projects="DLL\CurConv.dproj"/>
+    </Target>
+    <Target Name="CurConv:Clean">
+        <MSBuild Projects="DLL\CurConv.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CurConv:Make">
+        <MSBuild Projects="DLL\CurConv.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CurConvDLLDemo">
+        <MSBuild Projects="DLL Usage Demo\Delphi\CurConvDLLDemo.dproj"/>
+    </Target>
+    <Target Name="CurConvDLLDemo:Clean">
+        <MSBuild Projects="DLL Usage Demo\Delphi\CurConvDLLDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CurConvDLLDemo:Make">
+        <MSBuild Projects="DLL Usage Demo\Delphi\CurConvDLLDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CurConv;CurConvDLLDemo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CurConv:Clean;CurConvDLLDemo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CurConv:Make;CurConvDLLDemo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

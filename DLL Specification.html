@@ -1,0 +1,248 @@
+<html>
+
+<head>
+	<title>ViaThinkSoft Currency Converter - DLL specification</title>
+</head>
+
+<body>
+
+<h1>ViaThinkSoft Currency Converter - DLL specification</h1>
+
+<h2>Table of Contents</h2>
+
+<p>These functions are exported by <b>CurConv.dll</b>:</p>
+
+<ul>
+	<li><a href="#DeleteAPIKey">DeleteAPIKey</a></li>
+	<li><a href="#WriteAPIKey">WriteAPIKey</a></li>
+	<li><a href="#ReadAPIKey">ReadAPIKey</a></li>
+	<li><a href="#Convert">Convert</a></li>
+	<li><a href="#AcceptedCurrencies">AcceptedCurrencies</a></li>
+	<li><a href="#DownloadNow">DownloadNow</a></li>
+</ul>
+
+<h2 id="DeleteAPIKey">DeleteAPIKey</h3>
+
+<h3>Syntax</h4>
+<h4>Delphi</h5>
+<pre>
+function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+</pre>
+<h4>C</h5>
+<pre>
+HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
+</pre>
+
+<h3>Description</h4>
+<p>Deletes the API key from the registry.</p>
+
+<h3>Parameters</h4>
+<ul>
+	<li>UserMode: If true, the API key will be deleted from <code>HKEY_LOCAL_USER</code>, otherwise it will be deleted on <code>HKEY_LOCAL_MACHINE</code>.</li>
+	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
+</ul>
+
+<h3>Returns</h4>
+<ul>
+	<li>S_VTSCONV_OK (0x20000000) if the key could be successfully deleted.</li>
+	<li>S_VTSCONV_NOTHING (0x20000001) if no key could be found.</li>
+	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured.</li>
+</ul>
+
+<h2 id="WriteAPIKey">WriteAPIKey</h3>
+
+<h3>Syntax</h4>
+<h4>Delphi</h5>
+<pre>
+function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKeyW(key: LPCWSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKeyA(key: LPCSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+</pre>
+<h4>C</h5>
+<pre>
+HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, BOOL UserMode, BOOL DontShowErrors);
+HRESULT __stdcall WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors);
+</pre>
+
+<h3>Description</h4>
+<p>Writes the API key into the registry. This is usually not neccessary, since the convert functions are able to query the key from the user using the GUI.</p>
+
+<h3>Parameters</h4>
+<ul>
+	<li>key: The 32 digit key you received from currencylayer.com</li>
+	<li>UserMode: If true, the API key will be written into <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
+	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
+</ul>
+
+<h3>Returns</h4>
+<ul>
+	<li>S_VTSCONV_OK (0x20000000) if the key could be successfully deleted.</li>
+	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured, e.g. if the registry is write protected.</li>
+	<li>E_VTSCONV_BAD_ARGS (0xA0000001) if the key is invalid.</li>
+</ul>
+
+<h2 id="ReadAPIKey">ReadAPIKey</h3>
+
+<h3>Syntax</h4>
+<h4>Delphi</h5>
+<pre>
+function ReadAPIKey(key: LPTSTR; DontShowErrors: BOOL): HRESULT; stdcall;
+function ReadAPIKeyW(key: LPWSTR; DontShowErrors: BOOL): HRESULT; stdcall;
+function ReadAPIKeyA(key: LPSTR; DontShowErrors: BOOL): HRESULT; stdcall;
+</pre>
+<h4>C</h5>
+<pre>
+HRESULT __stdcall ReadAPIKeyW(LPWSTR key, BOOL DontShowErrors);
+HRESULT __stdcall ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
+</pre>
+
+<h3>Description</h4>
+<p>Reads the API key from the registry.</p>
+
+<h3>Parameters</h4>
+<ul>
+	<li>key: A buffer where the 32 digit key will be written to. There should be at least 33 chars memory reserved (32 chars key + 1 char zero termination).</li>
+	<li>UserMode: If true, the API key will be written into <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
+	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
+</ul>
+
+<h3>Returns</h4>
+<ul>
+	<li>S_VTSCONV_OK (0x20000000) if the key could be successfully deleted.</li>
+	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured, e.g. if the registry is write protected.</li>
+	<li>E_VTSCONV_STOREDKEY_INVALID (0xA0000002) if the key stored in the registry is invalid.</li>
+	<li>E_VTSCONV_NO_STOREDKEY (0xA0000003) if there is no key stored in the registry.</li>
+</ul>
+
+<h2 id="Convert">Convert</h3>
+
+<h3>Syntax</h4>
+<h4>Delphi</h5>
+<pre>
+function Convert(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+</pre>
+<h4>C</h5>
+<pre>
+Double __stdcall ConvertW(Double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, DWORD Flags, DATE HistoricDate);
+Double __stdcall ConvertA(Double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge; DWORD Flags, DATE HistoricDate);
+</pre>
+
+<h3>Description</h4>
+<p>Converts into a differnt currency.</p>
+
+<h3>Parameters</h4>
+<ul>
+	<li>Value: The amount of money in the source currency you want to convert into the target currency.</li>
+	<li>CurFrom: The source currency, formatted as defined in ISO-4217 (3 chars, e.g. "USD")</li>
+	<li>CurTo: The target currency, formatted as defined in ISO-4217 (3 chars, e.g. "USD")</li>
+	<li>MaxAge: Defines, after which amount of time the exchange data needs to be re-downloaded from the server.<ul>
+		<li>-1: Only download once</li>
+		<li&gt;0: Always download, on each request (attention: API keys may have limited amount of accesses per month)</li>
+		<li>&gt;0: Download after the supplied amount of time (in seconds)</li>
+	</ul></li>
+	<li>Flags: Is a sum of following components:<ul>
+		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
+		<li>CONVERT_FALLBACK_TO_CACHE (2): If download failed, use the previous downloaded cache file, even if it is older than MaxAge.</li>
+		<li>CONVERT_USE_SSL (4): Use SSL to download the data. Note that only a paid subscription allows download via SSL.</li>
+		<li>CONVERT_CONFIRM_WEB_ACCESS (8): Ask the user each time the API tries to download from the web.</li>
+		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
+	</ul></li>
+	<li>HistoricDate:<ul>
+		<li&gt;0: Use the current exchange data</li>
+		<li>any valid DATE: use an historic exchange</li>
+	</ul></li>
+</ul>
+
+<h3>Returns</h4>
+<ul>
+	<li>-1 if an error occured</li>
+	<li>&gt;=0 the amount of money in the target currency</li>
+</ul>
+
+<h2 id="AcceptedCurrencies">AcceptedCurrencies</h3>
+
+<h3>Syntax</h4>
+<h4>Delphi</h5>
+<pre>
+function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
+function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
+function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
+</pre>
+<h4>C</h5>
+<pre>
+int __stdcall AcceptedCurrencies(LPTSTR WriteTo, int MaxAge, DWORD Flags, DATE HistoricDate);
+int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, DWORD Flags, DATE HistoricDate);
+int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, DWORD Flags, DATE HistoricDate);
+</pre>
+
+<h3>Description</h4>
+<p>Shows a list of available currencies.</p>
+
+<h3>Parameters</h4>
+<ul>
+	<li>WriteTo: A pointer to which the available currencies will be written to. Please reserve at least (NumOfCurrencies*3+1) characters of memory. To query how many currencies are available, please invoke the method once and set this parameter to NULL. All currencies will be appended in the format as defined in ISO-4217. Example: "USDEURCAD\0" will be a list of USD, EUR and CAD.</li>
+	<li>MaxAge: Defines, after which amount of time the exchange data needs to be re-downloaded from the server.<ul>
+		<li>-1: Only download once</li>
+		<li&gt;0: Always download, on each request (attention: API keys may have limited amount of accesses per month)</li>
+		<li>&gt;0: Download after the supplied amount of time (in seconds)</li>
+	</ul></li>
+	<li>Flags: Is a sum of following components:<ul>
+		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
+		<li>CONVERT_FALLBACK_TO_CACHE (2): If download failed, use the previous downloaded cache file, even if it is older than MaxAge.</li>
+		<li>CONVERT_USE_SSL (4): Use SSL to download the data. Note that only a paid subscription allows download via SSL.</li>
+		<li>CONVERT_CONFIRM_WEB_ACCESS (8): Ask the user each time the API tries to download from the web.</li>
+		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
+	</ul></li>
+	<li>HistoricDate:<ul>
+		<li&gt;0: Use the current exchange data</li>
+		<li>any valid DATE: use an historic exchange</li>
+	</ul></li>
+</ul>
+
+<h3>Returns</h4>
+<ul>
+	<li>-1 if an error occured</li>
+	<li>&gt;=0 the number of currencies found/written</li>
+</ul>
+
+<h2 id="DownloadNow">DownloadNow</h3>
+
+<h3>Syntax</h4>
+<h4>Delphi</h5>
+<pre>
+function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
+</pre>
+<h4>C</h5>
+<pre>
+HRESULT __stdcall DownloadNow(DWORD Flags, DATE HistoricDate);
+</pre>
+
+<h3>Description</h4>
+<p>Forces the framework to download the currency table.</p>
+
+<h3>Parameters</h4>
+<ul>
+	<li>Flags: Is a sum of following components:<ul>
+		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
+		<li>CONVERT_FALLBACK_TO_CACHE (2): If download failed, use the previous downloaded cache file, even if it is older than MaxAge.</li>
+		<li>CONVERT_USE_SSL (4): Use SSL to download the data. Note that only a paid subscription allows download via SSL.</li>
+		<li>CONVERT_CONFIRM_WEB_ACCESS (8): Ask the user each time the API tries to download from the web.</li>
+		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
+	</ul></li>
+	<li>HistoricDate:<ul>
+		<li&gt;0: Use the current exchange data</li>
+		<li>any valid DATE: use an historic exchange</li>
+	</ul></li>
+</ul>
+
+<h3>Returns</h4>
+<ul>
+	<li>S_VTSCONV_OK (0x20000000) if the download was successful.</li>
+	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured.</li>
+</ul>
+
+</body>
+
+</html>

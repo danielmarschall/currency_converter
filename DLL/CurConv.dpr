@@ -212,7 +212,7 @@ begin
       if Assigned(WriteTo) then
       begin
         s := '';
-        for i := 0 to sl.Count - 1 do s := s + Trim(sl.Strings[i]);
+        for i := 0 to sl.Count - 1 do s := s + WideString(Trim(sl.Strings[i]));
         ZeroMemory(WriteTo, (3*result+1)*SizeOf(WideChar));
         CopyMemory(WriteTo, @s[1], 3*result*SizeOf(WideChar));
       end;
@@ -250,7 +250,7 @@ begin
       if Assigned(WriteTo) then
       begin
         s := '';
-        for i := 0 to sl.Count - 1 do s := s + Trim(sl.Strings[i]);
+        for i := 0 to sl.Count - 1 do s := s + AnsiString(Trim(sl.Strings[i]));
         ZeroMemory(WriteTo, (3*result+1)*SizeOf(AnsiChar));
         CopyMemory(WriteTo, @s[1], 3*result*SizeOf(AnsiChar));
       end;

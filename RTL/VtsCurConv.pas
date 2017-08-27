@@ -72,6 +72,8 @@ var
   HTTP: TIdHTTP;
 const
   HTTP_RESPONSE_OK = 200;
+resourcestring
+  S_CANNOT_DOWNLOAD = 'Cannot download from %s';
 begin
   // https://stackoverflow.com/questions/9239267/how-to-download-a-web-page-into-a-variable
   Result := '';
@@ -83,7 +85,7 @@ begin
       if HTTP.ResponseCode = HTTP_RESPONSE_OK then
         Result := Response.DataString
       else
-        raise EVtsCurConvException.CreateFmt('Cannot download from %s', [aURL]);
+        raise EVtsCurConvException.CreateFmt(S_CANNOT_DOWNLOAD, [aURL]);
     finally
       HTTP.Free;
     end;
@@ -114,6 +116,8 @@ class procedure TVtsCurConv.WriteAPIKey(key: TVtsCurApiKey; UserMode: boolean=tr
   procedure _WriteAPIKey(root: HKEY);
   var
     reg: TRegistry;
+  resourcestring
+    S_CANNOT_OPEN_REGISTRY = 'Cannot open registry key';
   begin
     reg := TRegistry.Create;
     try
@@ -123,7 +127,7 @@ class procedure TVtsCurConv.WriteAPIKey(key: TVtsCurApiKey; UserMode: boolean=tr
         reg.WriteString('APIKey', key);
         reg.CloseKey;
       end
-      else raise EVtsCurConvException.Create('Cannot open registry key');
+      else raise EVtsCurConvException.Create(S_CANNOT_OPEN_REGISTRY);
     finally
       reg.Free;
     end;
@@ -194,6 +198,11 @@ var
   xRoot: TlkJSONobject;
   xQuotes: TlkJSONobject;
   xRate: TlkJSONnumber;
+resourcestring
+  S_JSON_ENTRY_MISSING = 'JSON entry "%s" is missing!';
+  S_WRONG_QUOTE_LEN = 'Length of quotes-entry is unexpected!';
+  S_JSON_RATE_MISSING = 'JSON entry quotes->rate is missing!';
+  S_CURRENCY_NOT_SUPPORTED = 'Currency "%s" not supported';
 begin
   result := 0; // to avoid that the compiler shows a warning
 
@@ -205,10 +214,10 @@ begin
   xRoot := TlkJSON.ParseText(sJSON) as TlkJSONobject;
   try
     xSource := xRoot.Field['source'] as TlkJSONstring;
-    if not assigned(xSource) then raise EVtsCurConvException.Create('JSON entry "source" is missing!');
+    if not assigned(xSource) then raise EVtsCurConvException.CreateFmt(S_JSON_ENTRY_MISSING, ['source']);
 
     xQuotes := xRoot.Field['quotes'] as TlkJSONobject;
-    if not assigned(xQuotes) then raise EVtsCurConvException.Create('JSON entry "quotes" is missing!');
+    if not assigned(xQuotes) then raise EVtsCurConvException.CreateFmt(S_JSON_ENTRY_MISSING, ['quotes']);
 
     rateToFound := false;
     rateFromFound := false;
@@ -217,10 +226,10 @@ begin
 
     for i := 0 to xQuotes.Count - 1 do
     begin
-      if Length(xQuotes.NameOf[i]) <> 6 then raise EVtsCurConvException.Create('Length of quotes-entry is unexpected!');
+      if Length(xQuotes.NameOf[i]) <> 6 then raise EVtsCurConvException.Create(S_WRONG_QUOTE_LEN);
 
       xRate := xQuotes.Field[xQuotes.NameOf[i]] as TlkJSONnumber;
-      if not Assigned(xRate) then raise EVtsCurConvException.Create('JSON entry quotes->rate is missing!');
+      if not Assigned(xRate) then raise EVtsCurConvException.Create(S_JSON_RATE_MISSING);
 
       if Copy(xQuotes.NameOf[i], 1, 3) = xSource.Value then
       begin
@@ -237,8 +246,8 @@ begin
       end;
     end;
 
-    if not rateToFound then raise EVtsCurConvException.CreateFmt('Currency "%s" not supported', [toCur]);
-    if not rateFromFound then raise EVtsCurConvException.CreateFmt('Currency "%s" not supported', [fromCur]);
+    if not rateToFound then raise EVtsCurConvException.CreateFmt(S_CURRENCY_NOT_SUPPORTED, [toCur]);
+    if not rateFromFound then raise EVtsCurConvException.CreateFmt(S_CURRENCY_NOT_SUPPORTED, [fromCur]);
 
     result := value * rateTo / rateFrom;
   finally
@@ -249,9 +258,13 @@ end;
 procedure TVtsCurConv.QueryAPIKey(msg: string='');
 var
   s: string;
+resourcestring
+  S_CURRENCYLAYER = 'currencylayer.com';
+  S_ENTER_KEY = 'Please enter your API key:';
+  S_NO_API_KEY = 'No API key provided.';
 begin
-  s := Trim(InputBox('currencylayer.com', Trim(msg + ' Please enter your API key:'), ''));
-  if s = '' then raise EVtsCurConvException.Create('No API key provided.');
+  s := Trim(InputBox(S_CURRENCYLAYER, Trim(msg + ' ' + S_ENTER_KEY), ''));
+  if s = '' then raise EVtsCurConvException.Create(S_NO_API_KEY);
   WriteAPIKey(s);
 end;
 
@@ -262,6 +275,9 @@ var
   xSource: TlkJSONstring;
   xRoot: TlkJSONobject;
   xQuotes: TlkJSONobject;
+resourcestring
+  S_JSON_ENTRY_MISSING = 'JSON entry "%s" is missing!';
+  S_WRONG_QUOTE_LEN = 'Length of quotes-entry is unexpected!';
 begin
   result := 0;
 
@@ -270,14 +286,14 @@ begin
   xRoot := TlkJSON.ParseText(sJSON) as TlkJSONobject;
   try
     xSource := xRoot.Field['source'] as TlkJSONstring;
-    if not assigned(xSource) then raise EVtsCurConvException.Create('JSON entry "source" is missing!');
+    if not assigned(xSource) then raise EVtsCurConvException.CreateFmt(S_JSON_ENTRY_MISSING, ['source']);
 
     xQuotes := xRoot.Field['quotes'] as TlkJSONobject;
-    if not assigned(xQuotes) then raise EVtsCurConvException.Create('JSON entry "quotes" is missing!');
+    if not assigned(xQuotes) then raise EVtsCurConvException.CreateFmt(S_JSON_ENTRY_MISSING, ['quotes']);
 
     for i := 0 to xQuotes.Count - 1 do
     begin
-      if Length(xQuotes.NameOf[i]) <> 6 then raise EVtsCurConvException.Create('Length of quotes-entry is unexpected!');
+      if Length(xQuotes.NameOf[i]) <> 6 then raise EVtsCurConvException.Create(S_WRONG_QUOTE_LEN);
 
       if Copy(xQuotes.NameOf[i], 1, 3) = xSource.Value then
       begin
@@ -293,6 +309,8 @@ end;
 function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
 
   procedure _HandleKeyInvalidOrMissing(cacheFileName: string; msg: string; out doRetry: boolean; out json: string);
+  resourcestring
+    S_ENTER_NEW_KEY = 'Do you want to enter a new one?';
   begin
     if FallBackToCache then
     begin
@@ -303,7 +321,7 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
       end
       else
       begin
-        if MessageDlg(Trim(msg + ' Do you want to enter a new one?'), mtError, mbYesNoCancel, 0) = ID_YES then
+        if MessageDlg(Trim(msg + ' ' + S_ENTER_NEW_KEY), mtError, mbYesNoCancel, 0) = ID_YES then
         begin
           QueryAPIKey;
           doRetry := true;
@@ -339,6 +357,15 @@ var
   cacheDirName, cacheFileName: string;
   needDownload: boolean;
   mTime: TDateTime;
+resourcestring
+  S_CANNOT_CREATE_DIR = 'Cannot create directory %s';
+  S_INVALID_MAXAGE = 'Invalid maxage';
+  S_NO_API_KEY_PROVIDED = 'No API key provided.';
+  S_DOWNLOAD_QUERY = 'Download %s to %s ?';
+  S_JSON_FILE_INVALID = 'JSON file invalid';
+  S_UNKNOWN_SUCCESS = 'Cannot determinate status of the query.';
+  S_JSON_UNKNOWN_ERROR = 'Unknown error while loading JSON.';
+  S_API_KEY_INVALID = 'API key invalid.';
 begin
   try
     {$REGION 'Determinate file location and URL'}
@@ -346,7 +373,7 @@ begin
     cacheDirName := IncludeTrailingPathDelimiter(GetTempDir) + 'ViaThinkSoft\CurrencyConverter\';
     if not ForceDirectories(cacheDirName) then
     begin
-      raise EVtsCurConvException.CreateFmt('Cannot create directory %s', [cacheDirName]);
+      raise EVtsCurConvException.CreateFmt(S_CANNOT_CREATE_DIR, [cacheDirName]);
     end;
 
     if Secure then protocol := 'https' else protocol := 'http';
@@ -370,7 +397,7 @@ begin
       needDownload := true;
       if MaxAgeSeconds < -1 then
       begin
-        raise EVtsCurConvException.Create('Invalid maxage');
+        raise EVtsCurConvException.Create(S_INVALID_MAXAGE);
       end
       else if MaxAgeSeconds = -1 then
       begin
@@ -406,7 +433,7 @@ begin
       {$REGION 'Is an API key available?'}
       if ReadAPIKey = '' then
       begin
-        _HandleKeyInvalidOrMissing(cacheFileName, 'No API key provided.', doRetry, sJSON);
+        _HandleKeyInvalidOrMissing(cacheFileName, S_NO_API_KEY_PROVIDED, doRetry, sJSON);
         if not doRetry then
         begin
           result := sJSON;
@@ -418,7 +445,7 @@ begin
       {$REGION 'Download and check if everything is OK'}
       repeat
         {$REGION 'Confirm web access?'}
-        if ConfirmWebAccess and (MessageDlg('Download ' + url + ' to ' + cacheFileName + ' ?', mtConfirmation, mbYesNoCancel, 0) <> ID_YES) then
+        if ConfirmWebAccess and (MessageDlg(Format(S_DOWNLOAD_QUERY, [url, cacheFileName]), mtConfirmation, mbYesNoCancel, 0) <> ID_YES) then
         begin
           if FallBackToCache then
           begin
@@ -434,10 +461,10 @@ begin
         sJSON := GetPage(url);
 
         xRoot := TlkJSON.ParseText(sJSON) as TlkJSONobject;
-        if not assigned(xRoot) then raise EVtsCurConvException.Create('JSON file invalid');
+        if not assigned(xRoot) then raise EVtsCurConvException.Create(S_JSON_FILE_INVALID);
 
         xSuccess := xRoot.Field['success'] as TlkJSONboolean;
-        if not assigned(xSuccess) then raise EVtsCurConvException.Create('Cannot determinate status of the query.');
+        if not assigned(xSuccess) then raise EVtsCurConvException.Create(S_UNKNOWN_SUCCESS);
 
         if xSuccess.Value then
         begin
@@ -458,13 +485,13 @@ begin
               xRoot.Field['error'].Field['type'].Value]);
           except
             keyInvalid := false;
-            msg := 'Unknown error while loading JSON.';
+            msg := S_JSON_UNKNOWN_ERROR;
           end;
           {$ENDREGION}
 
           if keyInvalid then
           begin
-            _HandleKeyInvalidOrMissing(cacheFileName, 'API key invalid.', doRetry, sJSON);
+            _HandleKeyInvalidOrMissing(cacheFileName, S_API_KEY_INVALID, doRetry, sJSON);
           end
           else // if not keyInvalid then
           begin

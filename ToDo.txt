@@ -1,6 +1,4 @@
 
 Make ConvertEx(): Shall return a struct (Success, Value, TimeStamp) Attention: Align by 4 byte to make it compatible with VBA.
 
-DLL: Use resourcestrings
-
-Make examples for VB, C++ etc
+DLL Specification: Show VisualBasic syntax

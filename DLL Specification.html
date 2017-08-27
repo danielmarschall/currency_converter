@@ -8,7 +8,7 @@
 
 <h1>ViaThinkSoft Currency Converter - DLL specification</h1>
 
-<p><i>Last change: 26.08.2017</i></p>
+<p><i>Last change: 27.08.2017</i></p>
 
 <h2>Table of Contents</h2>
 
@@ -152,7 +152,7 @@ double __stdcall ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge
 		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
 	</ul></li>
 	<li>HistoricDate:<ul>
-		<li&gt;0: Use the current exchange data</li>
+		<li>0: Use the current exchange data</li>
 		<li>any valid DATE: use an historic exchange</li>
 	</ul></li>
 </ul>
@@ -197,7 +197,7 @@ int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags
 		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
 	</ul></li>
 	<li>HistoricDate:<ul>
-		<li&gt;0: Use the current exchange data</li>
+		<li>0: Use the current exchange data</li>
 		<li>any valid DATE: use an historic exchange</li>
 	</ul></li>
 </ul>
@@ -233,7 +233,7 @@ HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
 		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
 	</ul></li>
 	<li>HistoricDate:<ul>
-		<li&gt;0: Use the current exchange data</li>
+		<li>0: Use the current exchange data</li>
 		<li>any valid DATE: use an historic exchange</li>
 	</ul></li>
 </ul>

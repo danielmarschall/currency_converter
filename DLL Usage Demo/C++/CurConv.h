@@ -16,11 +16,8 @@ const HRESULT S_VTSCONV_NOTHING         = 0x20000001; // Success, Customer defin
 const HRESULT E_VTSCONV_GENERIC_FAILURE = 0xA0000000; // Failure, Customer defined, Facility 0, Code 0
 const HRESULT E_VTSCONV_BAD_ARGS        = 0xA0000001; // Failure, Customer defined, Facility 0, Code 1
 
-#ifdef BUILDING_DLL
-#define CURCONV_API extern "C" __declspec(dllexport) __stdcall
-#else
-#define CURCONV_API extern "C" __declspec(dllimport) __stdcall
-#endif
+//#define CURCONV_API extern "C" __declspec(dllimport)
+#define CURCONV_API extern "C" __stdcall
 
 CURCONV_API HRESULT DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
 
@@ -30,8 +27,8 @@ CURCONV_API HRESULT WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors)
 CURCONV_API HRESULT ReadAPIKeyW(LPWSTR key, BOOL DontShowErrors);
 CURCONV_API HRESULT ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 
-CURCONV_API float ConvertW(float Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
-CURCONV_API float ConvertA(float Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+CURCONV_API double ConvertW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+CURCONV_API double ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 
 CURCONV_API int AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 CURCONV_API int AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);

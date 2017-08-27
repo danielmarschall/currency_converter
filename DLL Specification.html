@@ -1,18 +1,22 @@
+<!DOCTYPE html>
 <html>
 
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>ViaThinkSoft Currency Converter - DLL specification</title>
+	<style type="text/css">
+		pre { white-space: pre-wrap !important; }
+		body { font-family:system, -apple-system, ".SFNSText-Regular", "San Francisco", "Oxygen", "Ubuntu", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif; }
+	</style>
 </head>
 
 <body>
 
 <h1>ViaThinkSoft Currency Converter - DLL specification</h1>
 
-<p><i>Last change: 27.08.2017</i></p>
-
 <h2>Table of Contents</h2>
 
-<p>These functions are exported by <b>CurConv.dll</b>:</p>
+<p>These methods are exported by <b>CurConv.dll</b>:</p>
 
 <ul>
 	<li><a href="#DeleteAPIKey">DeleteAPIKey</a></li>
@@ -23,92 +27,86 @@
 	<li><a href="#DownloadNow">DownloadNow</a></li>
 </ul>
 
-<h2 id="DeleteAPIKey">DeleteAPIKey</h3>
+<h2 id="DeleteAPIKey">DeleteAPIKey</h2>
 
-<h3>Syntax</h4>
-<h4>Delphi</h5>
-<pre>
-function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+<h3>Syntax</h3>
+<h4>Delphi</h4>
+<pre>function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
-<h4>C</h5>
-<pre>
-HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
+<h4>C</h4>
+<pre>HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
 </pre>
 
-<h3>Description</h4>
+<h3>Description</h3>
 <p>Deletes the API key from the registry.</p>
 
-<h3>Parameters</h4>
+<h3>Parameters</h3>
 <ul>
 	<li>UserMode: If true, the API key will be deleted from <code>HKEY_LOCAL_USER</code>, otherwise it will be deleted on <code>HKEY_LOCAL_MACHINE</code>.</li>
-	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
+	<li>DontShowErrors: If true, no errors will be displayed, otherwise, errors will result in a dialog box, in addition to the result code.</li>
 </ul>
 
-<h3>Returns</h4>
+<h3>Returns</h3>
 <ul>
 	<li>S_VTSCONV_OK (0x20000000) if the key could be successfully deleted.</li>
 	<li>S_VTSCONV_NOTHING (0x20000001) if no key could be found.</li>
 	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured.</li>
 </ul>
 
-<h2 id="WriteAPIKey">WriteAPIKey</h3>
+<h2 id="WriteAPIKey">WriteAPIKey</h2>
 
-<h3>Syntax</h4>
-<h4>Delphi</h5>
-<pre>
-function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+<h3>Syntax</h3>
+<h4>Delphi</h4>
+<pre>function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 function WriteAPIKeyW(key: LPCWSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 function WriteAPIKeyA(key: LPCSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
-<h4>C</h5>
-<pre>
-HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, BOOL UserMode, BOOL DontShowErrors);
+<h4>C</h4>
+<pre>HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, BOOL UserMode, BOOL DontShowErrors);
 HRESULT __stdcall WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors);
 </pre>
 
-<h3>Description</h4>
-<p>Writes the API key into the registry. This is usually not neccessary, since the convert functions are able to query the key from the user using the GUI.</p>
+<h3>Description</h3>
+<p>Writes the API key into the registry. This is usually not necessary, since the Convert() method is able to query the key from the user using the GUI.</p>
 
-<h3>Parameters</h4>
+<h3>Parameters</h3>
 <ul>
 	<li>key: The 32 digit key you received from currencylayer.com</li>
-	<li>UserMode: If true, the API key will be written into <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
+	<li>UserMode: If true, the API key will be written to <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
 	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
 </ul>
 
-<h3>Returns</h4>
+<h3>Returns</h3>
 <ul>
 	<li>S_VTSCONV_OK (0x20000000) if the key could be successfully deleted.</li>
 	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured, e.g. if the registry is write protected.</li>
 	<li>E_VTSCONV_BAD_ARGS (0xA0000001) if the key is invalid.</li>
 </ul>
 
-<h2 id="ReadAPIKey">ReadAPIKey</h3>
+<h2 id="ReadAPIKey">ReadAPIKey</h2>
 
-<h3>Syntax</h4>
-<h4>Delphi</h5>
-<pre>
-function ReadAPIKey(key: LPTSTR; DontShowErrors: BOOL): HRESULT; stdcall;
+<h3>Syntax</h3>
+<h4>Delphi</h4>
+<pre>function ReadAPIKey(key: LPTSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 function ReadAPIKeyW(key: LPWSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 function ReadAPIKeyA(key: LPSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
-<h4>C</h5>
-<pre>
-HRESULT __stdcall ReadAPIKeyW(LPWSTR key, BOOL DontShowErrors);
+<h4>C</h4>
+<pre>HRESULT __stdcall ReadAPIKeyW(LPWSTR key, BOOL DontShowErrors);
 HRESULT __stdcall ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 </pre>
 
-<h3>Description</h4>
+<h3>Description</h3>
 <p>Reads the API key from the registry.</p>
 
-<h3>Parameters</h4>
+<h3>Parameters</h3>
 <ul>
 	<li>key: A buffer where the 32 digit key will be written to. There should be at least 33 chars memory reserved (32 chars key + 1 char zero termination).</li>
 	<li>UserMode: If true, the API key will be written into <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
 	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
 </ul>
 
-<h3>Returns</h4>
+<h3>Returns</h3>
 <ul>
 	<li>S_VTSCONV_OK (0x20000000) if the key could be successfully deleted.</li>
 	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured, e.g. if the registry is write protected.</li>
@@ -116,32 +114,30 @@ HRESULT __stdcall ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 	<li>E_VTSCONV_NO_STOREDKEY (0xA0000003) if there is no key stored in the registry.</li>
 </ul>
 
-<h2 id="Convert">Convert</h3>
+<h2 id="Convert">Convert</h2>
 
-<h3>Syntax</h4>
-<h4>Delphi</h5>
-<pre>
-function Convert(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+<h3>Syntax</h3>
+<h4>Delphi</h4>
+<pre>function Convert(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
 function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
 function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
 </pre>
-<h4>C</h5>
-<pre>
-double __stdcall ConvertW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+<h4>C</h4>
+<pre>double __stdcall ConvertW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 double __stdcall ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
-<h3>Description</h4>
+<h3>Description</h3>
 <p>Converts into a differnt currency.</p>
 
-<h3>Parameters</h4>
+<h3>Parameters</h3>
 <ul>
 	<li>Value: The amount of money in the source currency you want to convert into the target currency.</li>
 	<li>CurFrom: The source currency, formatted as defined in ISO-4217 (3 chars, e.g. "USD")</li>
 	<li>CurTo: The target currency, formatted as defined in ISO-4217 (3 chars, e.g. "USD")</li>
 	<li>MaxAge: Defines, after which amount of time the exchange data needs to be re-downloaded from the server.<ul>
 		<li>-1: Only download once</li>
-		<li&gt;0: Always download, on each request (attention: API keys may have limited amount of accesses per month)</li>
+		<li>0: Always download, on each request (attention: API keys may have limited amount of accesses per month)</li>
 		<li>&gt;0: Download after the supplied amount of time (in seconds)</li>
 	</ul></li>
 	<li>Flags: Is a sum of following components:<ul>
@@ -157,36 +153,34 @@ double __stdcall ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge
 	</ul></li>
 </ul>
 
-<h3>Returns</h4>
+<h3>Returns</h3>
 <ul>
 	<li>-1 if an error occured</li>
 	<li>&gt;=0 the amount of money in the target currency</li>
 </ul>
 
-<h2 id="AcceptedCurrencies">AcceptedCurrencies</h3>
+<h2 id="AcceptedCurrencies">AcceptedCurrencies</h2>
 
-<h3>Syntax</h4>
-<h4>Delphi</h5>
-<pre>
-function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
+<h3>Syntax</h3>
+<h4>Delphi</h4>
+<pre>function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
 function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
 function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
 </pre>
-<h4>C</h5>
-<pre>
-int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+<h4>C</h4>
+<pre>int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
-<h3>Description</h4>
+<h3>Description</h3>
 <p>Shows a list of available currencies.</p>
 
-<h3>Parameters</h4>
+<h3>Parameters</h3>
 <ul>
 	<li>WriteTo: A pointer to which the available currencies will be written to. Please reserve at least (NumOfCurrencies*3+1) characters of memory. To query how many currencies are available, please invoke the method once and set this parameter to NULL. All currencies will be appended in the format as defined in ISO-4217. Example: "USDEURCAD\0" will be a list of USD, EUR and CAD.</li>
 	<li>MaxAge: Defines, after which amount of time the exchange data needs to be re-downloaded from the server.<ul>
 		<li>-1: Only download once</li>
-		<li&gt;0: Always download, on each request (attention: API keys may have limited amount of accesses per month)</li>
+		<li>0: Always download, on each request (attention: API keys may have limited amount of accesses per month)</li>
 		<li>&gt;0: Download after the supplied amount of time (in seconds)</li>
 	</ul></li>
 	<li>Flags: Is a sum of following components:<ul>
@@ -202,28 +196,26 @@ int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags
 	</ul></li>
 </ul>
 
-<h3>Returns</h4>
+<h3>Returns</h3>
 <ul>
 	<li>-1 if an error occured</li>
 	<li>&gt;=0 the number of currencies found/written</li>
 </ul>
 
-<h2 id="DownloadNow">DownloadNow</h3>
+<h2 id="DownloadNow">DownloadNow</h2>
 
-<h3>Syntax</h4>
-<h4>Delphi</h5>
-<pre>
-function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
+<h3>Syntax</h3>
+<h4>Delphi</h4>
+<pre>function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
 </pre>
-<h4>C</h5>
-<pre>
-HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
+<h4>C</h4>
+<pre>HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
-<h3>Description</h4>
+<h3>Description</h3>
 <p>Forces the framework to download the currency table.</p>
 
-<h3>Parameters</h4>
+<h3>Parameters</h3>
 <ul>
 	<li>Flags: Is a sum of following components:<ul>
 		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
@@ -238,11 +230,15 @@ HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
 	</ul></li>
 </ul>
 
-<h3>Returns</h4>
+<h3>Returns</h3>
 <ul>
 	<li>S_VTSCONV_OK (0x20000000) if the download was successful.</li>
 	<li>E_VTSCONV_GENERIC_FAILURE (0xA0000000) if an error occured.</li>
 </ul>
+
+<hr>
+
+<p><i>Last change: 27.08.2017</i></p>
 
 </body>
 

@@ -2,3 +2,6 @@
 Make ConvertEx(): Shall return a struct (Success, Value, TimeStamp) Attention: Align by 4 byte to make it compatible with VBA.
 
 DLL Specification: Show VisualBasic syntax
+
+Maybe explain in the manual:
+	It is not recommended to pass negative prices, because this way, errors (which will result in a return value -1) cannot be identified easily.

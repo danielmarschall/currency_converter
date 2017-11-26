@@ -102,7 +102,6 @@ HRESULT __stdcall ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 <h3>Parameters</h3>
 <ul>
 	<li>key: A buffer where the 32 digit key will be written to. There should be at least 33 chars memory reserved (32 chars key + 1 char zero termination).</li>
-	<li>UserMode: If true, the API key will be written into <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
 	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
 </ul>
 

@@ -127,10 +127,12 @@ class CurCalc {
 	}
 
 	public function convert_cur($value, $from_cur, $to_cur) {
-		$exchange_rates_ary = $this->get_exchange_rates_ary();
-
 		$from_cur = strtoupper(trim($from_cur));
 		$to_cur = strtoupper(trim($to_cur));
+		
+		if ($from_cur == $to_cur) return $value;
+
+		$exchange_rates_ary = $this->get_exchange_rates_ary();
 
 		if (!isset($exchange_rates_ary[$from_cur])) throw new CurCalcException('Source curreny $from_cur not found in exchange data.');
 		if (!isset($exchange_rates_ary[$to_cur])) throw new CurCalcException('Destination curreny $to_cur not found in exchange data.');

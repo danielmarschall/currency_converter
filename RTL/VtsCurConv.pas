@@ -208,6 +208,12 @@ begin
 
   fromCur := Trim(UpperCase(fromCur));
   toCur := Trim(UpperCase(toCur));
+  
+  if fromCur = toCur then
+  begin
+    result := value;
+    exit;
+  end;
 
   sJSON := GetJsonRaw(HistoricDate);
 

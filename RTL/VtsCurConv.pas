@@ -317,11 +317,16 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
   procedure _HandleKeyInvalidOrMissing(cacheFileName: string; msg: string; out doRetry: boolean; out json: string);
   resourcestring
     S_ENTER_NEW_KEY = 'Do you want to enter a new one?';
+    S_NO_CACHE_EXISTING = 'Cannot get the data online, and no cache exists. Please check your internet connection and API key.';
   begin
     if FallBackToCache then
     begin
       if not InteractiveAPIKeyInput then
       begin
+        if not FileExists(cacheFileName) then
+        begin
+          raise Exception.Create(S_NO_CACHE_EXISTING);
+        end;
         json := FileGetContents(cacheFileName);
         doRetry := false;
       end
@@ -334,6 +339,10 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
         end
         else
         begin
+          if not FileExists(cacheFileName) then
+          begin
+            raise Exception.Create(S_NO_CACHE_EXISTING);
+          end;
           json := FileGetContents(cacheFileName);
           doRetry := false;
         end;
@@ -353,18 +362,61 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
     end;
   end;
 
+  function protocol: string;
+  begin
+    if Secure then result := 'https' else result := 'http';
+  end;
+
+  function url: string;
+  var
+    sDate: string;
+  begin
+    if HistoricDate = 0 then
+    begin
+      sDate := '';
+      result := protocol + '://www.apilayer.net/api/live?access_key=' + ReadAPIKey;
+    end
+    else
+    begin
+      DateTimeToString(sDate, 'YYYY-MM-DD', HistoricDate);
+      result := protocol + '://www.apilayer.net/api/historical?date=' + sDate + '&access_key=' + ReadAPIKey;
+    end;
+  end;
+
+  function cacheFileName: string;
+  resourcestring
+    S_CANNOT_CREATE_DIR = 'Cannot create directory %s';
+  var
+    sDate: string;
+    cacheDirName: string;
+  begin
+    // cacheDirName := IncludeTrailingPathDelimiter(GetSpecialPath(CSIDL_PROGRAM_FILES_COMMON)) + 'ViaThinkSoft\CurrencyConverter\';
+    cacheDirName := IncludeTrailingPathDelimiter(GetTempDir) + 'ViaThinkSoft\CurrencyConverter\';
+    if not ForceDirectories(cacheDirName) then
+    begin
+      raise EVtsCurConvException.CreateFmt(S_CANNOT_CREATE_DIR, [cacheDirName]);
+    end;
+
+    if HistoricDate = 0 then
+    begin
+      sDate := '';
+      result := IncludeTrailingPathDelimiter(cacheDirName) + 'live.json';
+    end
+    else
+    begin
+      DateTimeToString(sDate, 'YYYY-MM-DD', HistoricDate);
+      result := IncludeTrailingPathDelimiter(cacheDirName) + 'historical-' + sDate + '.json';
+    end;
+  end;
+
 var
-  sJSON, msg, protocol: string;
+  sJSON, msg: string;
   xRoot: TlkJSONobject;
   xSuccess: TlkJSONboolean;
   keyInvalid, doRetry: boolean;
-  sDate: string;
-  url: string;
-  cacheDirName, cacheFileName: string;
   needDownload: boolean;
   mTime: TDateTime;
 resourcestring
-  S_CANNOT_CREATE_DIR = 'Cannot create directory %s';
   S_INVALID_MAXAGE = 'Invalid maxage';
   S_NO_API_KEY_PROVIDED = 'No API key provided.';
   S_DOWNLOAD_QUERY = 'Download %s to %s ?';
@@ -374,29 +426,6 @@ resourcestring
   S_API_KEY_INVALID = 'API key invalid.';
 begin
   try
-    {$REGION 'Determinate file location and URL'}
-    // cacheDirName := IncludeTrailingPathDelimiter(GetSpecialPath(CSIDL_PROGRAM_FILES_COMMON)) + 'ViaThinkSoft\CurrencyConverter\';
-    cacheDirName := IncludeTrailingPathDelimiter(GetTempDir) + 'ViaThinkSoft\CurrencyConverter\';
-    if not ForceDirectories(cacheDirName) then
-    begin
-      raise EVtsCurConvException.CreateFmt(S_CANNOT_CREATE_DIR, [cacheDirName]);
-    end;
-
-    if Secure then protocol := 'https' else protocol := 'http';
-    if HistoricDate = 0 then
-    begin
-      sDate := '';
-      url := protocol + '://www.apilayer.net/api/live?access_key=' + ReadAPIKey;
-      cacheFileName := IncludeTrailingPathDelimiter(cacheDirName) + 'live.json';
-    end
-    else
-    begin
-      DateTimeToString(sDate, 'YYYY-MM-DD', HistoricDate);
-      url := protocol + '://www.apilayer.net/api/historical?date=' + sDate + '&access_key=' + ReadAPIKey;
-      cacheFileName := IncludeTrailingPathDelimiter(cacheDirName) + 'historical-' + sDate + '.json';
-    end;
-    {$ENDREGION}
-
     {$REGION 'Determinate if we need to download or not'}
     if HistoricDate = 0 then
     begin
@@ -428,7 +457,7 @@ begin
     end;
     {$ENDREGION}
 
-    if not needDownload then
+    if not needDownload and FileExists(cacheFileName) then
     begin
       sJSON := FileGetContents(cacheFileName);
     end
@@ -453,7 +482,7 @@ begin
         {$REGION 'Confirm web access?'}
         if ConfirmWebAccess and (MessageDlg(Format(S_DOWNLOAD_QUERY, [url, cacheFileName]), mtConfirmation, mbYesNoCancel, 0) <> ID_YES) then
         begin
-          if FallBackToCache then
+          if FallBackToCache and FileExists(cacheFileName) then
           begin
             result := FileGetContents(cacheFileName);
             Exit;
@@ -501,7 +530,7 @@ begin
           end
           else // if not keyInvalid then
           begin
-            if FallBackToCache then
+            if FallBackToCache and FileExists(cacheFileName) then
             begin
               result := FileGetContents(cacheFileName);
               Exit;

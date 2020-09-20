@@ -5,3 +5,5 @@ DLL Specification: Show VisualBasic syntax
 
 Maybe explain in the manual:
 	It is not recommended to pass negative prices, because this way, errors (which will result in a return value -1) cannot be identified easily.
+
+64 Bit Release

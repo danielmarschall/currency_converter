@@ -3,7 +3,7 @@ unit VtsCurConv;
 interface
 
 uses
-  SysUtils, Classes, Controls;
+  SysUtils, Classes;
 
 type
   EVtsCurConvException = class(Exception);

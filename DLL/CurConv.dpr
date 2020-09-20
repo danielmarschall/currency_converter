@@ -5,7 +5,6 @@ uses
   Classes,
   Windows,
   Dialogs,
-  Controls,
   uLkJSON in '..\RTL\uLkJSON.pas',
   VtsCurConv in '..\RTL\VtsCurConv.pas';
 

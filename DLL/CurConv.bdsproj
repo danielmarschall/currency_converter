@@ -161,7 +161,7 @@
 		</VersionInfo>
 		<VersionInfoKeys>
 			<VersionInfoKeys Name="CompanyName">ViaThinkSoft</VersionInfoKeys>
-			<VersionInfoKeys Name="FileDescription">Currency Converter</VersionInfoKeys>
+			<VersionInfoKeys Name="FileDescription">CurConv</VersionInfoKeys>
 			<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
 			<VersionInfoKeys Name="InternalName"></VersionInfoKeys>
 			<VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>

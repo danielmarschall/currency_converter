@@ -50,7 +50,14 @@ function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; std
 implementation
 
 const
+
+  {$IFDEF WIN32}
   curConvDLL = 'CurConv.dll';
+  {$ENDIF}
+
+  {$IFDEF WIN64}
+  curConvDLL = 'CurConv.64.dll';
+  {$ENDIF}
 
 function DeleteAPIKey; external curConvDLL name 'DeleteAPIKey';
 

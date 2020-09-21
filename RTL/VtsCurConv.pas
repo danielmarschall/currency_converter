@@ -425,79 +425,78 @@ resourcestring
   S_JSON_UNKNOWN_ERROR = 'Unknown error while loading JSON.';
   S_API_KEY_INVALID = 'API key invalid.';
 begin
-  try
-    {$REGION 'Determinate if we need to download or not'}
-    if HistoricDate = 0 then
+  {$REGION 'Determinate if we need to download or not'}
+  if HistoricDate = 0 then
+  begin
+    needDownload := true;
+    if MaxAgeSeconds < -1 then
     begin
-      needDownload := true;
-      if MaxAgeSeconds < -1 then
-      begin
-        raise EVtsCurConvException.Create(S_INVALID_MAXAGE);
-      end
-      else if MaxAgeSeconds = -1 then
-      begin
-        // Only download once
-        needDownload := not FileExists(cacheFileName);
-      end
-      else if MaxAgeSeconds = 0 then
-      begin
-        // Always download
-        needDownload := true;
-      end
-      else if MaxAgeSeconds > 0 then
-      begin
-        // Download if older than <MaxAge> seconds
-        FileAge(cacheFileName, mTime);
-        needDownload := not FileExists(cacheFileName) or (SecondsBetween(Now, mTime) > MaxAgeSeconds);
-      end;
+      raise EVtsCurConvException.Create(S_INVALID_MAXAGE);
     end
-    else
+    else if MaxAgeSeconds = -1 then
     begin
-      needDownload := not FileExists(cacheFileName)
+      // Only download once
+      needDownload := not FileExists(cacheFileName);
+    end
+    else if MaxAgeSeconds = 0 then
+    begin
+      // Always download
+      needDownload := true;
+    end
+    else if MaxAgeSeconds > 0 then
+    begin
+      // Download if older than <MaxAge> seconds
+      FileAge(cacheFileName, mTime);
+      needDownload := not FileExists(cacheFileName) or (SecondsBetween(Now, mTime) > MaxAgeSeconds);
+    end;
+  end
+  else
+  begin
+    needDownload := not FileExists(cacheFileName)
+  end;
+  {$ENDREGION}
+
+  if not needDownload and FileExists(cacheFileName) then
+  begin
+    sJSON := FileGetContents(cacheFileName);
+  end
+  else
+  begin
+    doRetry := false;
+
+    {$REGION 'Is an API key available?'}
+    if ReadAPIKey = '' then
+    begin
+      _HandleKeyInvalidOrMissing(cacheFileName, S_NO_API_KEY_PROVIDED, doRetry, sJSON);
+      if not doRetry then
+      begin
+        result := sJSON;
+        Exit;
+      end;
     end;
     {$ENDREGION}
 
-    if not needDownload and FileExists(cacheFileName) then
-    begin
-      sJSON := FileGetContents(cacheFileName);
-    end
-    else
-    begin
-      doRetry := false;
-
-      {$REGION 'Is an API key available?'}
-      if ReadAPIKey = '' then
+    {$REGION 'Download and check if everything is OK'}
+    repeat
+      {$REGION 'Confirm web access?'}
+      if ConfirmWebAccess and (MessageDlg(Format(S_DOWNLOAD_QUERY, [url, cacheFileName]), mtConfirmation, mbYesNoCancel, 0) <> ID_YES) then
       begin
-        _HandleKeyInvalidOrMissing(cacheFileName, S_NO_API_KEY_PROVIDED, doRetry, sJSON);
-        if not doRetry then
+        if FallBackToCache and FileExists(cacheFileName) then
         begin
-          result := sJSON;
+          result := FileGetContents(cacheFileName);
           Exit;
-        end;
+        end
+        else Abort;
       end;
       {$ENDREGION}
 
-      {$REGION 'Download and check if everything is OK'}
-      repeat
-        {$REGION 'Confirm web access?'}
-        if ConfirmWebAccess and (MessageDlg(Format(S_DOWNLOAD_QUERY, [url, cacheFileName]), mtConfirmation, mbYesNoCancel, 0) <> ID_YES) then
-        begin
-          if FallBackToCache and FileExists(cacheFileName) then
-          begin
-            result := FileGetContents(cacheFileName);
-            Exit;
-          end
-          else Abort;
-        end;
-        {$ENDREGION}
+      doRetry := false;
 
-        doRetry := false;
+      sJSON := GetPage(url);
 
-        sJSON := GetPage(url);
-
-        xRoot := TlkJSON.ParseText(sJSON) as TlkJSONobject;
-        if not assigned(xRoot) then raise EVtsCurConvException.Create(S_JSON_FILE_INVALID);
-
+      xRoot := TlkJSON.ParseText(sJSON) as TlkJSONobject;
+      if not assigned(xRoot) then raise EVtsCurConvException.Create(S_JSON_FILE_INVALID);
+      try
         xSuccess := xRoot.Field['success'] as TlkJSONboolean;
         if not assigned(xSuccess) then raise EVtsCurConvException.Create(S_UNKNOWN_SUCCESS);
 
@@ -541,14 +540,14 @@ begin
             end;
           end;
         end;
-      until not doRetry;
-      {$ENDREGION}
-    end;
-
-    result := sJSON;
-  finally
-    FreeAndNil(xRoot);
+      finally
+        FreeAndNil(xRoot);
+      end;
+    until not doRetry;
+    {$ENDREGION}
   end;
+
+  result := sJSON;
 end;
 
 end.

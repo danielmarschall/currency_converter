@@ -75,7 +75,7 @@ class CurCalc {
 
 		if ((!isset($data['success'])) || ($data['success'] !== true)) {
 			if ($raise_exception) {
-				if (isset($test_data['error'])) throw new CurrencyLayerException($test_data['error']['code'] . ' : ' . $test_data['error']['info']);
+				if (isset($data['error'])) throw new CurrencyLayerException($data['error']['code'] . ' : ' . $data['error']['info']);
 				throw new CurCalcException('JSON file '.$this->jsonfile.' does not contain valid request data. Please download it again.');
 			} else {
 				return false;

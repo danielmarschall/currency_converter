@@ -114,7 +114,7 @@ class CurCalc {
 		$exchange_rates_ary = array();
 		$source = $data['source'];
 		$quotes = $data['quotes'];
-		$quotes['USDUSD'] = 1; // missing 06 Aug 2022. A bug?? Reported https://github.com/apilayer/currencylayer-API/issues/16
+		$quotes[$source.$source] = 1; // "USDUSD" missing 06 Aug 2022. A bug?? Reported https://github.com/apilayer/currencylayer-API/issues/16
 		foreach ($quotes as $n => $v) {
 			if ($source == substr($n, 0, 3)) {
 				$exchange_rates_ary[substr($n, 3, 3)] = $v; // key: USDxxx=12.345

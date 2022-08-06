@@ -1,8 +1,8 @@
 <?php
 
 // PHP library for CurrencyLayer
-// (C) 2017 ViaThinkSoft, Daniel Marschall
-// Revision: 2017-03-25
+// (C) 2017-2022 ViaThinkSoft, Daniel Marschall
+// Revision: 2022-08-06
 //
 // More information at https://currencylayer.com/documentation
 
@@ -112,12 +112,17 @@ class CurCalc {
 		$this->check_data_ok($data);
 
 		$exchange_rates_ary = array();
+		$source = $data['source'];
 		$quotes = $data['quotes'];
+		$quotes['USDUSD'] = 1; // missing 06 Aug 2022. A bug?? Reported https://github.com/apilayer/currencylayer-API/issues/16
 		foreach ($quotes as $n => $v) {
-			$exchange_rates_ary[substr($n, 3, 3)] = $v; // key: USDxxx=12.345
+			if ($source == substr($n, 0, 3)) {
+				$exchange_rates_ary[substr($n, 3, 3)] = $v; // key: USDxxx=12.345
+			}
 		}
 		unset($quotes);
 
+		asort($exchange_rates_ary);
 		$this->cache_exchange_rates_ary = $exchange_rates_ary;
 		return $exchange_rates_ary;
 	}
@@ -129,13 +134,13 @@ class CurCalc {
 	public function convert_cur($value, $from_cur, $to_cur) {
 		$from_cur = strtoupper(trim($from_cur));
 		$to_cur = strtoupper(trim($to_cur));
-		
+
 		if ($from_cur == $to_cur) return $value;
 
 		$exchange_rates_ary = $this->get_exchange_rates_ary();
 
-		if (!isset($exchange_rates_ary[$from_cur])) throw new CurCalcException('Source curreny $from_cur not found in exchange data.');
-		if (!isset($exchange_rates_ary[$to_cur])) throw new CurCalcException('Destination curreny $to_cur not found in exchange data.');
+		if (!isset($exchange_rates_ary[$from_cur])) throw new CurCalcException("Source curreny $from_cur not found in exchange data.");
+		if (!isset($exchange_rates_ary[$to_cur])) throw new CurCalcException("Destination curreny $to_cur not found in exchange data.");
 
 		return $value * $exchange_rates_ary[$to_cur]/$exchange_rates_ary[$from_cur];
 	}

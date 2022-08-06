@@ -548,6 +548,10 @@ begin
   end;
 
   result := sJSON;
+
+  // "USDUSD" missing 06 Aug 2022. A bug?? Reported https://github.com/apilayer/currencylayer-API/issues/16
+  if Pos('"USDUSD"', result) = 0 then
+    result := StringReplace(result, '"quotes":{', '"quotes":{"USDUSD":1.00,', []);
 end;
 
 end.

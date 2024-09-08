@@ -1,6 +1,2 @@
 
 DLL Specification: Show VisualBasic syntax (Github #2)
-
-Übersichtsgrafik
-- auf GitHub hosten, nicht vts
-- auch für darkmode kompatibel machen

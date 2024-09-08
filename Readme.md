@@ -1,5 +1,5 @@
 
-![](https://www.viathinksoft.de/screenshot.php?id=19)  
+![](CurrencyConverterOverview.png)
   
 ## Abstract  
   
@@ -19,7 +19,7 @@ If you are not a developer, you can download the ready-to-use demo EXE file.
   
 [Download Windows demo application, written in Delphi](https://www.viathinksoft.de/download.php?id=194)  
   
-![](https://www.viathinksoft.de/screenshot.php?id=18)  
+![](DLL Usage Demo/Delphi/Screenshot.png)  
   
 ## For Windows developers
   

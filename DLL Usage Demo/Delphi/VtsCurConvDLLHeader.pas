@@ -44,13 +44,13 @@ function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
 
 function ConvertEx(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer;
                    Flags: TVtsCurConvFlags; HistoricDate: TDate;
-                   OutValue: PDouble): HRESULT; stdcall;
+                   OutValue: PDouble; OutTimestamp: PDateTime): HRESULT; stdcall;
 function ConvertExW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
                     Flags: TVtsCurConvFlags; HistoricDate: TDate;
-                    OutValue: PDouble): HRESULT; stdcall;
+                    OutValue: PDouble; OutTimestamp: PDateTime): HRESULT; stdcall;
 function ConvertExA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
                     Flags: TVtsCurConvFlags; HistoricDate: TDate;
-                    OutValue: PDouble): HRESULT; stdcall;
+                    OutValue: PDouble; OutTimestamp: PDateTime): HRESULT; stdcall;
 
 function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
                             HistoricDate: TDate): Integer; stdcall;

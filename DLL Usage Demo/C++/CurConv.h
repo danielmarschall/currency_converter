@@ -29,8 +29,8 @@ CURCONV_API HRESULT ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 
 CURCONV_API double ConvertW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
 CURCONV_API double ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
-CURCONV_API HRESULT ConvertExW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, double* OutValue);
-CURCONV_API HRESULT ConvertExA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, double* OutValue);
+CURCONV_API HRESULT ConvertExW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, double* OutValue, DATE* OutTimestamp);
+CURCONV_API HRESULT ConvertExA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, double* OutValue, DATE* OutTimestamp);
 
 CURCONV_API int AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
 CURCONV_API int AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated

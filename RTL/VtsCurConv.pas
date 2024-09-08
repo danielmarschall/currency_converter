@@ -11,6 +11,10 @@ type
   TVtsCurApiKey = string;
   TVtsCur = string;
   TVtsRate = double;
+  TVtsCurConvResult = record
+    Value: Currency;
+    Timestamp: TDateTime;
+  end;
 
   TVtsCurConv = class(TObject)
   private
@@ -31,7 +35,7 @@ type
     class procedure WriteAPIKey(key: TVtsCurApiKey; UserMode: boolean=true);
     class function ReadAPIKey: TVtsCurApiKey;
     class function DeleteAPIKey(UserMode: boolean=true): boolean;
-    function Convert(value: Currency; fromCur, toCur: TVtsCur; HistoricDate: TDate=0): Currency;
+    function Convert(value: Currency; fromCur, toCur: TVtsCur; HistoricDate: TDate=0): TVtsCurConvResult;
     function GetAcceptedCurrencies(sl: TStringList=nil; HistoricDate: TDate=0): integer;
   end;
 
@@ -187,7 +191,17 @@ begin
   if result = '' then result := _ReadAPIKey(HKEY_LOCAL_MACHINE);
 end;
 
-function TVtsCurConv.Convert(value: Currency; fromCur, toCur: TVtsCur; HistoricDate: TDate=0): Currency;
+function TVtsCurConv.Convert(value: Currency; fromCur, toCur: TVtsCur; HistoricDate: TDate=0): TVtsCurConvResult;
+
+  function UnixToDateTimeWithSystemTime(UnixTime: Int64): TDateTime;
+  begin
+    // Umwandlung von Unix-Zeit (Sekunden seit 1.1.1970 UTC) in TDateTime
+    Result := UnixToDateTime(UnixTime);
+
+    // Konvertierung von UTC nach lokaler Systemzeit
+    Result := TTimeZone.Local.ToLocalTime(Result);
+  end;
+
 var
   rateTo, rateFrom: TVtsRate;
   i: Integer;
@@ -198,6 +212,7 @@ var
   xRoot: TlkJSONobject;
   xQuotes: TlkJSONobject;
   xRate: TlkJSONnumber;
+  xTimestamp: TlkJSONnumber;
 resourcestring
   S_JSON_ENTRY_MISSING = 'JSON entry "%s" is missing!';
   S_WRONG_QUOTE_LEN = 'Length of quotes-entry is unexpected!';
@@ -206,10 +221,11 @@ resourcestring
 begin
   fromCur := Trim(UpperCase(fromCur));
   toCur := Trim(UpperCase(toCur));
-  
+
   if fromCur = toCur then
   begin
-    result := value;
+    result.Value := value;
+    result.Timestamp := Now;
     exit;
   end;
 
@@ -222,6 +238,9 @@ begin
 
     xQuotes := xRoot.Field['quotes'] as TlkJSONobject;
     if not assigned(xQuotes) then raise EVtsCurConvException.CreateFmt(S_JSON_ENTRY_MISSING, ['quotes']);
+
+    xTimestamp := xRoot.Field['timestamp'] as TlkJSONNumber;
+    if not assigned(xTimestamp) then raise EVtsCurConvException.CreateFmt(S_JSON_ENTRY_MISSING, ['timestamp']);
 
     rateToFound := false;
     rateFromFound := false;
@@ -253,7 +272,8 @@ begin
     if not rateToFound then raise EVtsCurConvException.CreateFmt(S_CURRENCY_NOT_SUPPORTED, [toCur]);
     if not rateFromFound then raise EVtsCurConvException.CreateFmt(S_CURRENCY_NOT_SUPPORTED, [fromCur]);
 
-    result := value * rateTo / rateFrom;
+    result.Value := value * rateTo / rateFrom;
+    result.Timestamp := UnixToDateTimeWithSystemTime(xTimeStamp.Value);
   finally
     xRoot.Free;
   end;

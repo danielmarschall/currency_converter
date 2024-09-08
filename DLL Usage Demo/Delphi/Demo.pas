@@ -15,6 +15,7 @@ type
     Label1: TLabel;
     DateTimePicker1: TDateTimePicker;
     CheckBox1: TCheckBox;
+    Label2: TLabel;
     procedure FormShow(Sender: TObject);
     procedure Recalc(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -78,13 +79,15 @@ procedure TForm1.Recalc(Sender: TObject);
 var
   s: string;
   d, dr: double;
+  ts: TDateTime;
 begin
   if not Initialized then exit;
   s := Edit1.Text;
   if TryStrToFloat(s, d) and (ComboBox1.Text <> '') and (ComboBox2.Text <> '') then
   begin
     dr := 0;
-    ConvertEx(d, PChar(ComboBox1.Text), PChar(ComboBox2.Text), MaxAge, Flags, HistoricDate, @dr);
+    ConvertEx(d, PChar(ComboBox1.Text), PChar(ComboBox2.Text), MaxAge, Flags, HistoricDate, @dr, @ts);
+    Label2.Caption := DateTimeToStr(ts);
     Edit2.Text := Format('%.2f', [dr]);
   end
   else

@@ -30,6 +30,13 @@ object Form1: TForm1
     Font.Style = []
     ParentFont = False
   end
+  object Label2: TLabel
+    Left = 216
+    Top = 48
+    Width = 12
+    Height = 13
+    Caption = '...'
+  end
   object ComboBox1: TComboBox
     Left = 111
     Top = 24

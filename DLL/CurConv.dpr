@@ -143,9 +143,10 @@ end;
 
 function ConvertExW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
                     Flags: TVtsCurConvFlags; HistoricDate: TDate;
-                    OutValue: PDouble): HRESULT; stdcall;
+                    OutValue: PDouble; OutTimeStamp: PDateTime): HRESULT; stdcall;
 var
   x: TVtsCurConv;
+  r: TVtsCurConvResult;
 begin
   try
     x := TVtsCurConv.Create;
@@ -155,7 +156,9 @@ begin
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
       x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
-      OutValue^ := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      r := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      OutValue^ := r.Value;
+      OutTimeStamp^ := r.Timestamp;
       Result := S_VTSCONV_OK;
     finally
       x.Free;
@@ -172,15 +175,18 @@ end;
 function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
                   Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
                   deprecated 'use ConvertExW';
+var
+  DummyTimestamp: TDateTime;
 begin
-  ConvertExW(Value, CurFrom, CurTo, MaxAge, Flags, HistoricDate, @Result);
+  ConvertExW(Value, CurFrom, CurTo, MaxAge, Flags, HistoricDate, @Result, @DummyTimestamp);
 end;
 
 function ConvertExA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
                     Flags: TVtsCurConvFlags; HistoricDate: TDate;
-                    OutValue: PDouble): HRESULT; stdcall;
+                    OutValue: PDouble; OutTimestamp: PDateTime): HRESULT; stdcall;
 var
   x: TVtsCurConv;
+  r: TVtsCurConvResult;
 begin
   try
     x := TVtsCurConv.Create;
@@ -190,7 +196,9 @@ begin
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
       x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
-      OutValue^ := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      r := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      OutValue^ := r.Value;
+      OutTimeStamp^ := r.Timestamp;
       Result := S_VTSCONV_OK;
     finally
       x.Free;
@@ -207,8 +215,10 @@ end;
 function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
                   Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
                   deprecated 'use ConvertExA';
+var
+  DummyTimestamp: TDateTime;
 begin
-  ConvertExA(Value, CurFrom, CurTo, MaxAge, Flags, HistoricDate, @Result);
+  ConvertExA(Value, CurFrom, CurTo, MaxAge, Flags, HistoricDate, @Result, @DummyTimestamp);
 end;
 
 {$ENDREGION}

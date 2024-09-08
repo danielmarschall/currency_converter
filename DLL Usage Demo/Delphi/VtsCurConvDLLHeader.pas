@@ -16,11 +16,12 @@ const
   CONVERT_NO_INTERACTIVE_API_KEY_INPUT {:TVtsCurConvFlags} = 16;
 
 const
-  S_VTSCONV_OK:              HRESULT = $20000000; // Success, Customer defined, Facility 0, Code 0
-  S_VTSCONV_NOTHING:         HRESULT = $20000001; // Success, Customer defined, Facility 0, Code 1
-  E_VTSCONV_GENERIC_FAILURE: HRESULT = $A0000000; // Failure, Customer defined, Facility 0, Code 0
-  E_VTSCONV_BAD_ARGS:        HRESULT = $A0000001; // Failure, Customer defined, Facility 0, Code 1
+  S_VTSCONV_OK:              HRESULT = HRESULT($20000000); // Success, Customer defined, Facility 0, Code 0
+  S_VTSCONV_NOTHING:         HRESULT = HRESULT($20000001); // Success, Customer defined, Facility 0, Code 1
+  E_VTSCONV_GENERIC_FAILURE: HRESULT = HRESULT($A0000000); // Failure, Customer defined, Facility 0, Code 0
+  E_VTSCONV_BAD_ARGS:        HRESULT = HRESULT($A0000001); // Failure, Customer defined, Facility 0, Code 1
 
+// TODO: Allow Mode for temporary storage in DLL runtime
 function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 
 function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
@@ -33,17 +34,43 @@ function ReadAPIKeyA(key: LPSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 
 function Convert(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer;
                  Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+                 deprecated 'use ConvertEx';
 function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
                   Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+                  deprecated 'use ConvertExW';
 function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
                   Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+                  deprecated 'use ConvertExA';
+
+function ConvertEx(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer;
+                   Flags: TVtsCurConvFlags; HistoricDate: TDate;
+                   OutValue: PDouble): HRESULT; stdcall;
+function ConvertExW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
+                    Flags: TVtsCurConvFlags; HistoricDate: TDate;
+                    OutValue: PDouble): HRESULT; stdcall;
+function ConvertExA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
+                    Flags: TVtsCurConvFlags; HistoricDate: TDate;
+                    OutValue: PDouble): HRESULT; stdcall;
 
 function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
                             HistoricDate: TDate): Integer; stdcall;
+                            deprecated 'use AcceptedCurrenciesEx';
 function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
                              HistoricDate: TDate): Integer; stdcall;
+                             deprecated 'use AcceptedCurrenciesExW';
 function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
                              HistoricDate: TDate): Integer; stdcall;
+                             deprecated 'use AcceptedCurrenciesExA';
+
+function AcceptedCurrenciesEx(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+                              HistoricDate: TDate;
+                              OutElements: PInteger): HRESULT; stdcall;
+function AcceptedCurrenciesExW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+                               HistoricDate: TDate;
+                               OutElements: PInteger): HRESULT; stdcall;
+function AcceptedCurrenciesExA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+                               HistoricDate: TDate;
+                               OutElements: PInteger): HRESULT; stdcall;
 
 function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
                              
@@ -86,12 +113,28 @@ function ConvertW; external curConvDLL name 'ConvertW';
 function ConvertA; external curConvDLL name 'ConvertA';
 
 {$IFDEF UNICODE}
+function ConvertEx; external curConvDLL name 'ConvertExW';
+{$ELSE}
+function ConvertEx; external curConvDLL name 'ConvertExA';
+{$ENDIF}
+function ConvertExW; external curConvDLL name 'ConvertExW';
+function ConvertExA; external curConvDLL name 'ConvertExA';
+
+{$IFDEF UNICODE}
 function AcceptedCurrencies; external curConvDLL name 'AcceptedCurrenciesW';
 {$ELSE}
 function AcceptedCurrencies; external curConvDLL name 'AcceptedCurrenciesA';
 {$ENDIF}
 function AcceptedCurrenciesW; external curConvDLL name 'AcceptedCurrenciesW';
 function AcceptedCurrenciesA; external curConvDLL name 'AcceptedCurrenciesA';
+
+{$IFDEF UNICODE}
+function AcceptedCurrenciesEx; external curConvDLL name 'AcceptedCurrenciesExW';
+{$ELSE}
+function AcceptedCurrenciesEx; external curConvDLL name 'AcceptedCurrenciesExA';
+{$ENDIF}
+function AcceptedCurrenciesExW; external curConvDLL name 'AcceptedCurrenciesExW';
+function AcceptedCurrenciesExA; external curConvDLL name 'AcceptedCurrenciesExA';
 
 function DownloadNow; external curConvDLL name 'DownloadNow';
 

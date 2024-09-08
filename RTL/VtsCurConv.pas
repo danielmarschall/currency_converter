@@ -38,7 +38,7 @@ type
 implementation
 
 uses
-  Windows, Registry, uLkJSON, Dialogs, IdHTTP, DateUtils;
+  Windows, Registry, uLkJSON, Dialogs, IdHTTP, DateUtils, Math, System.UITypes;
 
 function FileGetContents(filename: string): string;
 var
@@ -204,8 +204,6 @@ resourcestring
   S_JSON_RATE_MISSING = 'JSON entry quotes->rate is missing!';
   S_CURRENCY_NOT_SUPPORTED = 'Currency "%s" not supported';
 begin
-  result := 0; // to avoid that the compiler shows a warning
-
   fromCur := Trim(UpperCase(fromCur));
   toCur := Trim(UpperCase(toCur));
   
@@ -371,7 +369,7 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
   var
     sDate: string;
   begin
-    if HistoricDate = 0 then
+    if CompareValue(HistoricDate,0) = 0 then
     begin
       sDate := '';
       result := protocol + '://www.apilayer.net/api/live?access_key=' + ReadAPIKey;
@@ -397,7 +395,7 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
       raise EVtsCurConvException.CreateFmt(S_CANNOT_CREATE_DIR, [cacheDirName]);
     end;
 
-    if HistoricDate = 0 then
+    if CompareValue(HistoricDate,0) = 0 then
     begin
       sDate := '';
       result := IncludeTrailingPathDelimiter(cacheDirName) + 'live.json';
@@ -426,7 +424,7 @@ resourcestring
   S_API_KEY_INVALID = 'API key invalid.';
 begin
   {$REGION 'Determinate if we need to download or not'}
-  if HistoricDate = 0 then
+  if CompareValue(HistoricDate,0) = 0 then
   begin
     needDownload := true;
     if MaxAgeSeconds < -1 then

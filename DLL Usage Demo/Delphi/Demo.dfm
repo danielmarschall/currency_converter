@@ -13,11 +13,9 @@ object Form1: TForm1
   Font.Name = 'Tahoma'
   Font.Style = []
   KeyPreview = True
-  OldCreateOrder = False
   Position = poScreenCenter
   OnKeyUp = FormKeyUp
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 184
@@ -85,8 +83,8 @@ object Form1: TForm1
     Top = 76
     Width = 97
     Height = 21
-    Date = 42973.608142604160000000
-    Time = 42973.608142604160000000
+    Date = 42973.000000000000000000
+    Time = 0.608142604156455500
     TabOrder = 4
     TabStop = False
     OnChange = Recalc

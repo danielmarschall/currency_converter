@@ -5,6 +5,7 @@ uses
   Classes,
   Windows,
   Dialogs,
+  System.UITypes,
   uLkJSON in '..\RTL\uLkJSON.pas',
   VtsCurConv in '..\RTL\VtsCurConv.pas';
 
@@ -21,12 +22,12 @@ const
   CONVERT_NO_INTERACTIVE_API_KEY_INPUT: TVtsCurConvFlags = 16;
 
 const
-  S_VTSCONV_OK:                HRESULT = $20000000; // Success, Customer defined, Facility 0, Code 0
-  S_VTSCONV_NOTHING:           HRESULT = $20000001; // Success, Customer defined, Facility 0, Code 1
-  E_VTSCONV_GENERIC_FAILURE:   HRESULT = $A0000000; // Failure, Customer defined, Facility 0, Code 0
-  E_VTSCONV_BAD_ARGS:          HRESULT = $A0000001; // Failure, Customer defined, Facility 0, Code 1
-  E_VTSCONV_STOREDKEY_INVALID: HRESULT = $A0000002; // Failure, Customer defined, Facility 0, Code 2
-  E_VTSCONV_NO_STOREDKEY:      HRESULT = $A0000003; // Failure, Customer defined, Facility 0, Code 3
+  S_VTSCONV_OK:                HRESULT = HRESULT($20000000); // Success, Customer defined, Facility 0, Code 0
+  S_VTSCONV_NOTHING:           HRESULT = HRESULT($20000001); // Success, Customer defined, Facility 0, Code 1
+  E_VTSCONV_GENERIC_FAILURE:   HRESULT = HRESULT($A0000000); // Failure, Customer defined, Facility 0, Code 0
+  E_VTSCONV_BAD_ARGS:          HRESULT = HRESULT($A0000001); // Failure, Customer defined, Facility 0, Code 1
+  E_VTSCONV_STOREDKEY_INVALID: HRESULT = HRESULT($A0000002); // Failure, Customer defined, Facility 0, Code 2
+  E_VTSCONV_NO_STOREDKEY:      HRESULT = HRESULT($A0000003); // Failure, Customer defined, Facility 0, Code 3
 
 function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 begin
@@ -138,8 +139,11 @@ begin
   end;
 end;
 
-function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
-                  Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+{$REGION 'ConvertA, ConvertExA, ConvertW, ConvertExW'}
+
+function ConvertExW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
+                    Flags: TVtsCurConvFlags; HistoricDate: TDate;
+                    OutValue: PDouble): HRESULT; stdcall;
 var
   x: TVtsCurConv;
 begin
@@ -151,7 +155,8 @@ begin
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
       x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
-      result := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      OutValue^ := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      Result := S_VTSCONV_OK;
     finally
       x.Free;
     end;
@@ -159,39 +164,59 @@ begin
     on E: Exception do
     begin
       if Flags and CONVERT_DONT_SHOW_ERRORS = 0 then MessageDlg(e.Message, mtError, [mbOk], 0);
-      result := -1;
+      result := E_VTSCONV_GENERIC_FAILURE;
+    end;
+  end;
+end;
+
+function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer;
+                  Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+                  deprecated 'use ConvertExW';
+begin
+  ConvertExW(Value, CurFrom, CurTo, MaxAge, Flags, HistoricDate, @Result);
+end;
+
+function ConvertExA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
+                    Flags: TVtsCurConvFlags; HistoricDate: TDate;
+                    OutValue: PDouble): HRESULT; stdcall;
+var
+  x: TVtsCurConv;
+begin
+  try
+    x := TVtsCurConv.Create;
+    try
+      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
+      x.MaxAgeSeconds          := MaxAge;
+      x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
+      x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
+      x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
+      OutValue^ := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
+      Result := S_VTSCONV_OK;
+    finally
+      x.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      if Flags and CONVERT_DONT_SHOW_ERRORS = 0 then MessageDlg(e.Message, mtError, [mbOk], 0);
+      result := E_VTSCONV_GENERIC_FAILURE;
     end;
   end;
 end;
 
 function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer;
                   Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
-var
-  x: TVtsCurConv;
+                  deprecated 'use ConvertExA';
 begin
-  try
-    x := TVtsCurConv.Create;
-    try
-      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
-      x.MaxAgeSeconds          := MaxAge;
-      x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
-      x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
-      x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
-      result := x.Convert(value, TVtsCur(CurFrom), TVtsCur(CurTo), HistoricDate);
-    finally
-      x.Free;
-    end;
-  except
-    on E: Exception do
-    begin
-      if Flags and CONVERT_DONT_SHOW_ERRORS = 0 then MessageDlg(e.Message, mtError, [mbOk], 0);
-      result := -1;
-    end;
-  end;
+  ConvertExA(Value, CurFrom, CurTo, MaxAge, Flags, HistoricDate, @Result);
 end;
 
-function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
-                             HistoricDate: TDate): Integer; stdcall;
+{$ENDREGION}
+
+{$REGION 'AcceptedCurrenciesA, AcceptedCurrenciesExA, AcceptedCurrenciesW, AcceptedCurrenciesExW'}
+
+function AcceptedCurrenciesExW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+                               HistoricDate: TDate; OutElements: PInteger): HRESULT; stdcall;
 var
   x: TVtsCurConv;
   sl: TStringList;
@@ -207,14 +232,15 @@ begin
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
       x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
-      result := x.GetAcceptedCurrencies(sl, HistoricDate);
+      OutElements^ := x.GetAcceptedCurrencies(sl, HistoricDate);
       if Assigned(WriteTo) then
       begin
         s := '';
         for i := 0 to sl.Count - 1 do s := s + WideString(Trim(sl.Strings[i]));
-        ZeroMemory(WriteTo, (3*result+1)*SizeOf(WideChar));
-        CopyMemory(WriteTo, @s[1], 3*result*SizeOf(WideChar));
+        ZeroMemory(WriteTo, (3*OutElements^+1)*SizeOf(WideChar));
+        CopyMemory(WriteTo, @s[1], 3*OutElements^*SizeOf(WideChar));
       end;
+      Result := S_VTSCONV_OK;
     finally
       x.Free;
       if Assigned(WriteTo) then sl.Free;
@@ -223,13 +249,20 @@ begin
     on E: Exception do
     begin
       if Flags and CONVERT_DONT_SHOW_ERRORS = 0 then MessageDlg(e.Message, mtError, [mbOk], 0);
-      result := -1;
+      result := E_VTSCONV_GENERIC_FAILURE;
     end;
   end;
 end;
 
-function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
                              HistoricDate: TDate): Integer; stdcall;
+                             deprecated 'use AcceptedCurrenciesExW';
+begin
+  AcceptedCurrenciesExW(WriteTo, MaxAge, Flags, HistoricDate, @Result);
+end;
+
+function AcceptedCurrenciesExA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+                               HistoricDate: TDate; OutElements: PInteger): HRESULT; stdcall;
 var
   x: TVtsCurConv;
   sl: TStringList;
@@ -245,14 +278,15 @@ begin
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
       x.InteractiveAPIKeyInput := Flags and CONVERT_NO_INTERACTIVE_API_KEY_INPUT = 0;
-      result := x.GetAcceptedCurrencies(sl, HistoricDate);
+      OutElements^ := x.GetAcceptedCurrencies(sl, HistoricDate);
       if Assigned(WriteTo) then
       begin
         s := '';
         for i := 0 to sl.Count - 1 do s := s + AnsiString(Trim(sl.Strings[i]));
-        ZeroMemory(WriteTo, (3*result+1)*SizeOf(AnsiChar));
-        CopyMemory(WriteTo, @s[1], 3*result*SizeOf(AnsiChar));
+        ZeroMemory(WriteTo, (3*OutElements^+1)*SizeOf(AnsiChar));
+        CopyMemory(WriteTo, @s[1], 3*OutElements^*SizeOf(AnsiChar));
       end;
+      result := S_VTSCONV_OK;
     finally
       x.Free;
       if Assigned(WriteTo) then sl.Free;
@@ -261,10 +295,19 @@ begin
     on E: Exception do
     begin
       if Flags and CONVERT_DONT_SHOW_ERRORS = 0 then MessageDlg(e.Message, mtError, [mbOk], 0);
-      result := -1;
+      result := E_VTSCONV_GENERIC_FAILURE;
     end;
   end;
 end;
+
+function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags;
+                             HistoricDate: TDate): Integer; stdcall;
+                             deprecated 'use AcceptedCurrenciesExA';
+begin
+  AcceptedCurrenciesExA(WriteTo, MaxAge, Flags, HistoricDate, @Result);
+end;
+
+{$ENDREGION}
 
 function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
 var
@@ -299,9 +342,13 @@ exports
   ReadAPIKeyW,
   ReadAPIKeyA,
   ConvertW,
+  ConvertExW,
   ConvertA,
+  ConvertExA,
   AcceptedCurrenciesW,
   AcceptedCurrenciesA,
+  AcceptedCurrenciesExW,
+  AcceptedCurrenciesExA,
   DownloadNow;
 
 begin

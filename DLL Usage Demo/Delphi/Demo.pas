@@ -77,12 +77,16 @@ end;
 procedure TForm1.Recalc(Sender: TObject);
 var
   s: string;
-  d: double;
+  d, dr: double;
 begin
-  if not Initialized then exit;  
+  if not Initialized then exit;
   s := Edit1.Text;
   if TryStrToFloat(s, d) and (ComboBox1.Text <> '') and (ComboBox2.Text <> '') then
-    Edit2.Text := Format('%.2f', [Convert(d, PChar(ComboBox1.Text), PChar(ComboBox2.Text), MaxAge, Flags, HistoricDate)])
+  begin
+    dr := 0;
+    ConvertEx(d, PChar(ComboBox1.Text), PChar(ComboBox2.Text), MaxAge, Flags, HistoricDate, @dr);
+    Edit2.Text := Format('%.2f', [dr]);
+  end
   else
     Edit2.Text := '';
 end;
@@ -93,9 +97,17 @@ var
   s: string;
   i: integer;
 begin
-  num := AcceptedCurrencies(nil, MaxAge, Flags, HistoricDate);
+  if AcceptedCurrenciesEx(nil, MaxAge, Flags, HistoricDate, @num) <> S_VTSCONV_OK then
+  begin
+    Close;
+    Exit;
+  end;
   SetLength(s, 3*num+1);
-  num := AcceptedCurrencies(PChar(s), MaxAge, Flags, HistoricDate);
+  if AcceptedCurrenciesEx(PChar(s), MaxAge, Flags, HistoricDate, @num) <> S_VTSCONV_OK then
+  begin
+    Close;
+    Exit;
+  end;
   ComboBox1.Clear;
   ComboBox2.Clear;
   for i := 0 to num - 1 do

@@ -15,18 +15,28 @@ const
   CONVERT_CONFIRM_WEB_ACCESS           {:TVtsCurConvFlags} = 8;
   CONVERT_NO_INTERACTIVE_API_KEY_INPUT {:TVtsCurConvFlags} = 16;
 
+type
+  TVtsCurConvKeyStoreMode = type DWORD;
+
+const
+  CONVERT_KEYSTORE_REGISTRY_SYSTEM     {:TVtsCurConvKeyStoreMode} = 0;
+  CONVERT_KEYSTORE_REGISTRY_USER       {:TVtsCurConvKeyStoreMode} = 1;
+  CONVERT_KEYSTORE_MEMORY              {:TVtsCurConvKeyStoreMode} = 2;
+
 const
   S_VTSCONV_OK:              HRESULT = HRESULT($20000000); // Success, Customer defined, Facility 0, Code 0
   S_VTSCONV_NOTHING:         HRESULT = HRESULT($20000001); // Success, Customer defined, Facility 0, Code 1
   E_VTSCONV_GENERIC_FAILURE: HRESULT = HRESULT($A0000000); // Failure, Customer defined, Facility 0, Code 0
   E_VTSCONV_BAD_ARGS:        HRESULT = HRESULT($A0000001); // Failure, Customer defined, Facility 0, Code 1
 
-// TODO: Allow Mode for temporary storage in DLL runtime
-function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+// Mode 0 = Write in Registry System Wide
+// Mode 1 = Write in Registry User Local
+// Mode 2 = Keep in DLL while it is loaded
+function DeleteAPIKey(Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
 
-function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
-function WriteAPIKeyW(key: LPCWSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
-function WriteAPIKeyA(key: LPCSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKey(key: LPCTSTR; Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKeyW(key: LPCWSTR; Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKeyA(key: LPCSTR; Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
 
 function ReadAPIKey(key: LPTSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 function ReadAPIKeyW(key: LPWSTR; DontShowErrors: BOOL): HRESULT; stdcall;

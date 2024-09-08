@@ -1,5 +1,2 @@
 
 DLL Specification: Show VisualBasic syntax
-
-Implement API key storage temporary during DLL runtime
-https://github.com/danielmarschall/currency_converter/issues/1

@@ -32,11 +32,11 @@
 <h3>Syntax</h3>
 <h4>Delphi</h4>
 <pre>
-function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+function DeleteAPIKey(Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
 <pre>
-HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
+HRESULT __stdcall DeleteAPIKey(CURCONV_STORE_MODE Mode, BOOL DontShowErrors);
 </pre>
 
 <h3>Description</h3>
@@ -44,7 +44,11 @@ HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
 
 <h3>Parameters</h3>
 <ul>
-	<li>UserMode: If true, the API key will be deleted from <code>HKEY_LOCAL_USER</code>, otherwise it will be deleted on <code>HKEY_LOCAL_MACHINE</code>.</li>
+	<li>Mode:<ul>
+		<li>CONVERT_KEYSTORE_REGISTRY_SYSTEM (0) = The API key will be deleted from <code>HKEY_LOCAL_USER</code>.</li>
+		<li>CONVERT_KEYSTORE_REGISTRY_SYSTEM (1) = The API key will be deleted from <code>HKEY_LOCAL_MACHINE</code>.</li>
+		<li>CONVERT_KEYSTORE_MEMORY (2) = The API key will be deleted from temporary memory.</li>
+	</ul></li>
 	<li>DontShowErrors: If true, no errors will be displayed, otherwise, errors will result in a dialog box, in addition to the result code.</li>
 </ul>
 
@@ -60,14 +64,14 @@ HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
 <h3>Syntax</h3>
 <h4>Delphi</h4>
 <pre>
-function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
-function WriteAPIKeyW(key: LPCWSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
-function WriteAPIKeyA(key: LPCSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKey(key: LPCTSTR; Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKeyW(key: LPCWSTR; Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
+function WriteAPIKeyA(key: LPCSTR; Mode: TVtsCurConvKeyStoreMode; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
 <pre>
-HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, BOOL UserMode, BOOL DontShowErrors);
-HRESULT __stdcall WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors);
+HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, CURCONV_STORE_MODE Mode, BOOL DontShowErrors);
+HRESULT __stdcall WriteAPIKeyA(LPCSTR key, CURCONV_STORE_MODE Mode, BOOL DontShowErrors);
 </pre>
 
 <h3>Description</h3>
@@ -76,7 +80,11 @@ HRESULT __stdcall WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors);
 <h3>Parameters</h3>
 <ul>
 	<li>key: The 32 digit key you received from currencylayer.com</li>
-	<li>UserMode: If true, the API key will be written to <code>HKEY_LOCAL_USER</code>, otherwise it will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
+	<li>Mode:<ul>
+		<li>CONVERT_KEYSTORE_REGISTRY_SYSTEM (0) = The API key will be written to <code>HKEY_LOCAL_USER</code>.</li>
+		<li>CONVERT_KEYSTORE_REGISTRY_SYSTEM (1) = The API key will be written to <code>HKEY_LOCAL_MACHINE</code>.</li>
+		<li>CONVERT_KEYSTORE_MEMORY (2) = The API key will be written to temporary memory.</li>
+	</ul></li>
 	<li>DontShowErrors: If true, no errors will be displayed. If true, errors will result in a dialog box, in addition to the result code.</li>
 </ul>
 

@@ -100,6 +100,7 @@
         <Manifest_File>(Ohne)</Manifest_File>
         <OutputExt>64.dll</OutputExt>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+        <Debugger_HostApplication>..\Output\CurConvDLLDemo.64.exe</Debugger_HostApplication>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>

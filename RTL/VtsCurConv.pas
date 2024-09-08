@@ -23,6 +23,7 @@ type
     FConfirmWebAccess: boolean;
     FFallBackToCache: boolean;
     FInteractiveAPIKeyInput: boolean;
+    FTempApiKey: string;
   protected
     function GetJsonRaw(HistoricDate: TDate=0): string;
     procedure QueryAPIKey(msg: string=''); virtual;
@@ -32,11 +33,14 @@ type
     property ConfirmWebAccess: boolean read FConfirmWebAccess write FConfirmWebAccess;
     property FallBackToCache: boolean read FFallBackToCache write FFallBackToCache;
     property InteractiveAPIKeyInput: boolean read FInteractiveAPIKeyInput write FInteractiveAPIKeyInput;
+    procedure SetTempApiKey(const ApiKey: String);
+    procedure RemoveTempApiKey;
     class procedure WriteAPIKey(key: TVtsCurApiKey; UserMode: boolean=true);
     class function ReadAPIKey: TVtsCurApiKey;
     class function DeleteAPIKey(UserMode: boolean=true): boolean;
     function Convert(value: Currency; fromCur, toCur: TVtsCur; HistoricDate: TDate=0): TVtsCurConvResult;
     function GetAcceptedCurrencies(sl: TStringList=nil; HistoricDate: TDate=0): integer;
+    destructor Destroy; override;
   end;
 
 implementation
@@ -168,6 +172,12 @@ begin
     _DeleteAPIKey(HKEY_LOCAL_MACHINE);
 end;
 
+destructor TVtsCurConv.Destroy;
+begin
+  RemoveTempApiKey;
+  inherited;
+end;
+
 class function TVtsCurConv.ReadAPIKey: TVtsCurApiKey;
   function _ReadAPIKey(root: HKEY): string;
   var
@@ -189,6 +199,33 @@ class function TVtsCurConv.ReadAPIKey: TVtsCurApiKey;
 begin
   result := _ReadAPIKey(HKEY_CURRENT_USER);
   if result = '' then result := _ReadAPIKey(HKEY_LOCAL_MACHINE);
+end;
+
+procedure TVtsCurConv.RemoveTempApiKey;
+
+  procedure _WipeString(var S: string);
+  var
+    P: PChar;
+    Len: Integer;
+  begin
+    Len := Length(S);
+    if Len > 0 then
+    begin
+      // Direkten Zugriff auf die Zeichen im Speicher
+      P := PChar(S);
+      FillChar(P^, Len * SizeOf(Char), 0);  // Speicher mit Nullen füllen
+    end;
+    S := '';  // Den String leeren
+  end;
+
+begin
+  _WipeString(FTempApiKey);
+end;
+
+procedure TVtsCurConv.SetTempApiKey(const ApiKey: String);
+begin
+  RemoveTempApiKey;
+  FTempApiKey := ApiKey;
 end;
 
 function TVtsCurConv.Convert(value: Currency; fromCur, toCur: TVtsCur; HistoricDate: TDate=0): TVtsCurConvResult;
@@ -388,16 +425,21 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
   function url: string;
   var
     sDate: string;
+    ApiKey: string;
   begin
+    if FTempApiKey <> '' then
+      ApiKey := FTempApiKey
+    else
+      ApiKey := ReadAPIKey;
     if CompareValue(HistoricDate,0) = 0 then
     begin
       sDate := '';
-      result := protocol + '://www.apilayer.net/api/live?access_key=' + ReadAPIKey;
+      result := protocol + '://www.apilayer.net/api/live?access_key=' + ApiKey;
     end
     else
     begin
       DateTimeToString(sDate, 'YYYY-MM-DD', HistoricDate);
-      result := protocol + '://www.apilayer.net/api/historical?date=' + sDate + '&access_key=' + ReadAPIKey;
+      result := protocol + '://www.apilayer.net/api/historical?date=' + sDate + '&access_key=' + ApiKey;
     end;
   end;
 
@@ -483,7 +525,7 @@ begin
     doRetry := false;
 
     {$REGION 'Is an API key available?'}
-    if ReadAPIKey = '' then
+    if (FTempApiKey = '') and (ReadAPIKey = '') then
     begin
       _HandleKeyInvalidOrMissing(cacheFileName, S_NO_API_KEY_PROVIDED, doRetry, sJSON);
       if not doRetry then

@@ -31,10 +31,12 @@
 
 <h3>Syntax</h3>
 <h4>Delphi</h4>
-<pre>function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+<pre>
+function DeleteAPIKey(UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
-<pre>HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
+<pre>
+HRESULT __stdcall DeleteAPIKey(BOOL UserMode, BOOL DontShowErrors);
 </pre>
 
 <h3>Description</h3>
@@ -57,12 +59,14 @@
 
 <h3>Syntax</h3>
 <h4>Delphi</h4>
-<pre>function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
+<pre>
+function WriteAPIKey(key: LPCTSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 function WriteAPIKeyW(key: LPCWSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 function WriteAPIKeyA(key: LPCSTR; UserMode: BOOL; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
-<pre>HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, BOOL UserMode, BOOL DontShowErrors);
+<pre>
+HRESULT __stdcall WriteAPIKeyW(LPCWSTR key, BOOL UserMode, BOOL DontShowErrors);
 HRESULT __stdcall WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors);
 </pre>
 
@@ -87,12 +91,14 @@ HRESULT __stdcall WriteAPIKeyA(LPCSTR key, BOOL UserMode, BOOL DontShowErrors);
 
 <h3>Syntax</h3>
 <h4>Delphi</h4>
-<pre>function ReadAPIKey(key: LPTSTR; DontShowErrors: BOOL): HRESULT; stdcall;
+<pre>
+function ReadAPIKey(key: LPTSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 function ReadAPIKeyW(key: LPWSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 function ReadAPIKeyA(key: LPSTR; DontShowErrors: BOOL): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
-<pre>HRESULT __stdcall ReadAPIKeyW(LPWSTR key, BOOL DontShowErrors);
+<pre>
+HRESULT __stdcall ReadAPIKeyW(LPWSTR key, BOOL DontShowErrors);
 HRESULT __stdcall ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 </pre>
 
@@ -117,13 +123,21 @@ HRESULT __stdcall ReadAPIKeyA(LPSTR key, BOOL DontShowErrors);
 
 <h3>Syntax</h3>
 <h4>Delphi</h4>
-<pre>function Convert(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
-function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
-function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall;
+<pre>
+function Convert(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall; deprecated;
+function ConvertW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall; deprecated;
+function ConvertA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Double; stdcall; deprecated;
+
+function ConvertEx(Value: Double; CurFrom, CurTo: LPCTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate; OutValue: PDouble): HRESULT; stdcall;
+function ConvertExW(Value: Double; CurFrom, CurTo: LPCWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate; OutValue: PDouble): HRESULT; stdcall;
+function ConvertExA(Value: Double; CurFrom, CurTo: LPCSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate; OutValue: PDouble): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
-<pre>double __stdcall ConvertW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
-double __stdcall ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+<pre>
+double __stdcall ConvertW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
+double __stdcall ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
+HRESULT __stdcall ConvertExW(double Value, LPCWSTR CurFrom, LPCWSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, double* OutValue);
+HRESULT __stdcall ConvertExA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, double* OutValue);
 </pre>
 
 <h3>Description</h3>
@@ -162,13 +176,20 @@ double __stdcall ConvertA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int MaxAge
 
 <h3>Syntax</h3>
 <h4>Delphi</h4>
-<pre>function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
-function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
-function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall;
+<pre>
+function AcceptedCurrencies(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall; depreacted;
+function AcceptedCurrenciesW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall; depreacted;
+function AcceptedCurrenciesA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate): Integer; stdcall; depreacted;
+function AcceptedCurrenciesEx(WriteTo: LPTSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate; OutElements: PInteger): HRESULT; stdcall;
+function AcceptedCurrenciesExW(WriteTo: LPWSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate; OutElements: PInteger): HRESULT; stdcall;
+function AcceptedCurrenciesExA(WriteTo: LPSTR; MaxAge: integer; Flags: TVtsCurConvFlags; HistoricDate: TDate; OutElements: PInteger): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
-<pre>int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
-int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate);
+<pre>
+int __stdcall AcceptedCurrenciesW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
+int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate); // deprecated
+HRESULT __stdcall AcceptedCurrenciesExW(LPWSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, int* OutElements);
+HRESULT __stdcall AcceptedCurrenciesExA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags, DATE HistoricDate, int* OutElements);
 </pre>
 
 <h3>Description</h3>
@@ -205,10 +226,12 @@ int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags
 
 <h3>Syntax</h3>
 <h4>Delphi</h4>
-<pre>function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
+<pre>
+function DownloadNow(Flags: TVtsCurConvFlags; HistoricDate: TDate): HRESULT; stdcall;
 </pre>
 <h4>C</h4>
-<pre>HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
+<pre>
+HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
 </pre>
 
 <h3>Description</h3>
@@ -237,7 +260,7 @@ int __stdcall AcceptedCurrenciesA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS Flags
 
 <hr>
 
-<p><i>Last change: 27 Aug 2017</i></p>
+<p><i>Last change: 7 September 2024</i></p>
 
 </body>
 

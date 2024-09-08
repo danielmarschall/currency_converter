@@ -19,7 +19,7 @@ If you are not a developer, you can download the ready-to-use demo EXE file.
   
 [Download Windows demo application, written in Delphi](https://www.viathinksoft.de/download.php?id=194)  
   
-![](DLL Usage Demo/Delphi/Screenshot.png)  
+![](DLL%20Usage%20Demo/Delphi/Screenshot.png)
   
 ## For Windows developers
   

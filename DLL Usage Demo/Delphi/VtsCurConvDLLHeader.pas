@@ -11,7 +11,7 @@ type
 const
   CONVERT_DONT_SHOW_ERRORS             {:TVtsCurConvFlags} = 1;
   CONVERT_FALLBACK_TO_CACHE            {:TVtsCurConvFlags} = 2;
-  CONVERT_USE_SSL                      {:TVtsCurConvFlags} = 4;
+  CONVERT_USE_SSL                      {:TVtsCurConvFlags} = 4 deprecated 'Since all plans now support SSL, it is enabled by default.';
   CONVERT_CONFIRM_WEB_ACCESS           {:TVtsCurConvFlags} = 8;
   CONVERT_NO_INTERACTIVE_API_KEY_INPUT {:TVtsCurConvFlags} = 16;
 

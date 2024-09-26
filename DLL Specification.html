@@ -164,7 +164,7 @@ HRESULT __stdcall ConvertExA(double Value, LPCSTR CurFrom, LPCSTR CurTo, int Max
 	<li>Flags: Is a sum of following components:<ul>
 		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
 		<li>CONVERT_FALLBACK_TO_CACHE (2): If download failed, use the previous downloaded cache file, even if it is older than MaxAge.</li>
-		<li>CONVERT_USE_SSL (4): Use SSL to download the data. Note that only a paid subscription allows download via SSL.</li>
+		<!-- <li>CONVERT_USE_SSL (4): Depreacted. Since all plans now support SSL, it is enabled by default.</li> -->
 		<li>CONVERT_CONFIRM_WEB_ACCESS (8): Ask the user each time the API tries to download from the web.</li>
 		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
 	</ul></li>
@@ -216,7 +216,7 @@ HRESULT __stdcall AcceptedCurrenciesExA(LPSTR WriteTo, int MaxAge, CURCONV_FLAGS
 	<li>Flags: Is a sum of following components:<ul>
 		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
 		<li>CONVERT_FALLBACK_TO_CACHE (2): If download failed, use the previous downloaded cache file, even if it is older than MaxAge.</li>
-		<li>CONVERT_USE_SSL (4): Use SSL to download the data. Note that only a paid subscription allows download via SSL.</li>
+		<!-- <li>CONVERT_USE_SSL (4): Depreacted. Since all plans now support SSL, it is enabled by default.</li> -->
 		<li>CONVERT_CONFIRM_WEB_ACCESS (8): Ask the user each time the API tries to download from the web.</li>
 		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
 	</ul></li>
@@ -253,7 +253,7 @@ HRESULT __stdcall DownloadNow(CURCONV_FLAGS Flags, DATE HistoricDate);
 	<li>Flags: Is a sum of following components:<ul>
 		<li>CONVERT_DONT_SHOW_ERRORS (1): Don't show errors in a dialog box.</li>
 		<li>CONVERT_FALLBACK_TO_CACHE (2): If download failed, use the previous downloaded cache file, even if it is older than MaxAge.</li>
-		<li>CONVERT_USE_SSL (4): Use SSL to download the data. Note that only a paid subscription allows download via SSL.</li>
+		<!-- <li>CONVERT_USE_SSL (4): Depreacted. Since all plans now support SSL, it is enabled by default.</li> -->
 		<li>CONVERT_CONFIRM_WEB_ACCESS (8): Ask the user each time the API tries to download from the web.</li>
 		<li>CONVERT_NO_INTERACTIVE_API_KEY_INPUT (16): Don't ask the user for an API key in case the API key is missing or invalid.</li>
 	</ul></li>

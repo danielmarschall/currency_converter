@@ -17,7 +17,7 @@ type
 const
   CONVERT_DONT_SHOW_ERRORS:             TVtsCurConvFlags = 1;
   CONVERT_FALLBACK_TO_CACHE:            TVtsCurConvFlags = 2;
-  CONVERT_USE_SSL:                      TVtsCurConvFlags = 4;
+  CONVERT_USE_SSL:                      TVtsCurConvFlags = 4; // Depreacted. Since all plans now support SSL, it is enabled by default.
   CONVERT_CONFIRM_WEB_ACCESS:           TVtsCurConvFlags = 8;
   CONVERT_NO_INTERACTIVE_API_KEY_INPUT: TVtsCurConvFlags = 16;
 
@@ -272,7 +272,7 @@ begin
   try
     x := TVtsCurConv.Create;
     try
-      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
+      x.Secure                 := true; // Flags and CONVERT_USE_SSL <> 0;
       x.MaxAgeSeconds          := MaxAge;
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
@@ -313,7 +313,7 @@ begin
   try
     x := TVtsCurConv.Create;
     try
-      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
+      x.Secure                 := true; // Flags and CONVERT_USE_SSL <> 0;
       x.MaxAgeSeconds          := MaxAge;
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
@@ -360,7 +360,7 @@ begin
     x := TVtsCurConv.Create;
     if Assigned(WriteTo) then sl := TStringList.Create else sl := nil;
     try
-      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
+      x.Secure                 := true; // Flags and CONVERT_USE_SSL <> 0;
       x.MaxAgeSeconds          := MaxAge;
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
@@ -407,7 +407,7 @@ begin
     x := TVtsCurConv.Create;
     if Assigned(WriteTo) then sl := TStringList.Create else sl := nil;
     try
-      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
+      x.Secure                 := true; // Flags and CONVERT_USE_SSL <> 0;
       x.MaxAgeSeconds          := MaxAge;
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;
@@ -452,7 +452,7 @@ begin
   try
     x := TVtsCurConv.Create;
     try
-      x.Secure                 := Flags and CONVERT_USE_SSL <> 0;
+      x.Secure                 := true; // Flags and CONVERT_USE_SSL <> 0;
       x.MaxAgeSeconds          := 0; // Always Download
       x.ConfirmWebAccess       := Flags and CONVERT_CONFIRM_WEB_ACCESS <> 0;
       x.FallBackToCache        := Flags and CONVERT_FALLBACK_TO_CACHE <> 0;

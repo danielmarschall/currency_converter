@@ -467,7 +467,8 @@ function TVtsCurConv.GetJsonRaw(HistoricDate: TDate=0): string;
       ApiKey := FTempApiKey
     else
       ApiKey := ReadAPIKey;
-    if CompareValue(HistoricDate,0) = 0 then
+    if (CompareValue(HistoricDate,0) = 0) or
+       (CompareValue(Trunc(HistoricDate),Trunc(Now)) >= 0) then
     begin
       sDate := '';
       result := protocol + '://www.apilayer.net/api/live?access_key=' + ApiKey;
@@ -609,10 +610,10 @@ begin
           {$REGION 'Get information of the error'}
           try
             keyInvalid := xRoot.Field['error'].Field['code'].Value = 101;
-            msg := Format('%s (%s, %s)', [
+            msg := Format('%s (%s)', [
               xRoot.Field['error'].Field['info'].Value,
-              xRoot.Field['error'].Field['code'].Value,
-              xRoot.Field['error'].Field['type'].Value]);
+              xRoot.Field['error'].Field['code'].Value(*,
+              xRoot.Field['error'].Field['type'].Value*)]);
           except
             keyInvalid := false;
             msg := S_JSON_UNKNOWN_ERROR;

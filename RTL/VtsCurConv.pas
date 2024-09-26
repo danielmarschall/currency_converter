@@ -46,7 +46,7 @@ type
 implementation
 
 uses
-  Windows, Registry, uLkJSON, Dialogs, IdHTTP, DateUtils, Math, System.UITypes;
+  Windows, Registry, uLkJSON, wininet, Dialogs, DateUtils, Math, System.UITypes;
 
 function FileGetContents(filename: string): string;
 var
@@ -74,32 +74,68 @@ begin
   end;
 end;
 
-function GetPage(aURL: string): string;
+// https://www.delphipraxis.net/post43515.html , fixed , works for Delphi 12 Athens
+function GetPage(AUrl: string): RawByteString;
 var
-  Response: TStringStream;
-  HTTP: TIdHTTP;
-const
-  HTTP_RESPONSE_OK = 200;
-resourcestring
-  S_CANNOT_DOWNLOAD = 'Cannot download from %s';
+  databuffer : array[0..4095] of ansichar; // SIC! ansichar!
+  ResStr : ansistring; // SIC! ansistring
+  hSession, hfile: hInternet;
+  dwindex,dwcodelen,dwread,dwNumber: cardinal;
+  dwcode : array[1..20] of char;
+  res    : pchar;
+  Str    : pansichar; // SIC! pansichar
 begin
-  // https://stackoverflow.com/questions/9239267/how-to-download-a-web-page-into-a-variable
-  Result := '';
-  Response := TStringStream.Create('');
-  try
-    HTTP := TIdHTTP.Create(nil);
-    try
-      HTTP.Get(aURL, Response);
-      if HTTP.ResponseCode = HTTP_RESPONSE_OK then
-        Result := Response.DataString
-      else
-        raise EVtsCurConvException.CreateFmt(S_CANNOT_DOWNLOAD, [aURL]);
-    finally
-      HTTP.Free;
-    end;
-  finally
-    Response.Free;
+  ResStr:='';
+  if (system.pos('http://',lowercase(AUrl))=0) and // do not localize
+     (system.pos('https://',lowercase(AUrl))=0) then // do not localize
+     AUrl:='http://'+AUrl; // do not localize
+
+  hSession:=InternetOpen('InetURL:/1.0', // do not localize
+                         INTERNET_OPEN_TYPE_PRECONFIG,
+                         nil,
+                         nil,
+                         0);
+  if assigned(hsession) then
+  begin
+    hfile:=InternetOpenUrl(
+           hsession,
+           pchar(AUrl),
+           nil,
+           0,
+           INTERNET_FLAG_RELOAD,
+           0);
+    dwIndex  := 0;
+    dwCodeLen := 10;
+
+    HttpQueryInfo(hfile,
+                  HTTP_QUERY_STATUS_CODE,
+                  @dwcode,
+                  dwcodeLen,
+                  dwIndex);
+    res := pchar(@dwcode);
+    dwNumber := sizeof(databuffer)-1;
+    if (res ='200') or (res = '302') then // do not localize
+    begin
+      while (InternetReadfile(hfile,
+                              @databuffer,
+                              dwNumber,
+                              DwRead)) do
+      begin
+        if dwRead =0 then
+          break;
+        databuffer[dwread]:=#0;
+        Str := pansichar(@databuffer);
+        resStr := resStr + Str;
+      end;
+    end
+    else
+      ResStr := 'Status:'+AnsiString(res); // do not localize
+    if assigned(hfile) then
+      InternetCloseHandle(hfile);
   end;
+
+  InternetCloseHandle(hsession);
+  Result := resStr;
 end;
 
 function GetTempDir: string;

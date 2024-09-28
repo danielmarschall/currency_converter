@@ -74,68 +74,107 @@ begin
   end;
 end;
 
-// https://www.delphipraxis.net/post43515.html , fixed , works for Delphi 12 Athens
-function GetPage(AUrl: string): RawByteString;
-var
-  databuffer : array[0..4095] of ansichar; // SIC! ansichar!
-  ResStr : ansistring; // SIC! ansistring
-  hSession, hfile: hInternet;
-  dwindex,dwcodelen,dwread,dwNumber: cardinal;
-  dwcode : array[1..20] of char;
-  res    : pchar;
-  Str    : pansichar; // SIC! pansichar
-begin
-  ResStr:='';
-  if (system.pos('http://',lowercase(AUrl))=0) and // do not localize
-     (system.pos('https://',lowercase(AUrl))=0) then // do not localize
-     AUrl:='http://'+AUrl; // do not localize
+function WinInet_DoGet(const Url: string): string;
 
-  hSession:=InternetOpen('InetURL:/1.0', // do not localize
-                         INTERNET_OPEN_TYPE_PRECONFIG,
-                         nil,
-                         nil,
-                         0);
-  if assigned(hsession) then
+  const
+    USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+    MaxRedirects = 5;
+
+  function GetRedirectLocation(hRequest: HINTERNET): string;
+  var
+    Buffer: array[0..1023] of Char;
+    BufferLength, HeaderIndex: DWORD;
   begin
-    hfile:=InternetOpenUrl(
-           hsession,
-           pchar(AUrl),
-           nil,
-           0,
-           INTERNET_FLAG_RELOAD,
-           0);
-    dwIndex  := 0;
-    dwCodeLen := 10;
+    Result := '';
+    BufferLength := SizeOf(Buffer);
+    HeaderIndex := 0;
 
-    HttpQueryInfo(hfile,
-                  HTTP_QUERY_STATUS_CODE,
-                  @dwcode,
-                  dwcodeLen,
-                  dwIndex);
-    res := pchar(@dwcode);
-    dwNumber := sizeof(databuffer)-1;
-    if (res ='200') or (res = '302') then // do not localize
-    begin
-      while (InternetReadfile(hfile,
-                              @databuffer,
-                              dwNumber,
-                              DwRead)) do
-      begin
-        if dwRead =0 then
-          break;
-        databuffer[dwread]:=#0;
-        Str := pansichar(@databuffer);
-        resStr := resStr + Str;
-      end;
-    end
-    else
-      ResStr := 'Status:'+AnsiString(res); // do not localize
-    if assigned(hfile) then
-      InternetCloseHandle(hfile);
+    // Query the "Location" header to get the new URL for redirection
+    if HttpQueryInfo(hRequest, HTTP_QUERY_LOCATION, @Buffer, BufferLength, HeaderIndex) then
+      Result := string(Buffer);
   end;
 
-  InternetCloseHandle(hsession);
-  Result := resStr;
+  function GetStatusCode(hRequest: HINTERNET): DWORD;
+  var
+    StatusCode: DWORD;
+    StatusCodeLen: DWORD;
+    HeaderIndex: DWORD;
+  begin
+    StatusCode := 0;
+    StatusCodeLen := SizeOf(StatusCode);
+    HeaderIndex := 0;
+
+    // Query the status code from the HTTP response
+    if HttpQueryInfo(hRequest, HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER, @StatusCode, StatusCodeLen, HeaderIndex) then
+      Result := StatusCode
+    else
+      Result := 0;
+  end;
+
+var
+  AUrl: string;
+  databuffer : array[0..4095] of ansichar; // SIC! ansichar!
+  Response : ansistring; // SIC! ansistring
+  hSession, hRequest: hInternet;
+  dwread,dwNumber: cardinal;
+  Str    : pansichar; // SIC! pansichar
+  StatusCode: DWORD;
+  RedirectCount: integer;
+begin
+  Response:='';
+  AUrl := Url;
+
+  hSession:=InternetOpen(USER_AGENT, INTERNET_OPEN_TYPE_PRECONFIG, nil, nil, 0);
+  if not Assigned(hSession) then
+    raise Exception.Create('Error initializing WinInet: ' + SysErrorMessage(GetLastError));
+  try
+    RedirectCount := 0;
+    while true do
+    begin
+      hRequest:=InternetOpenUrl(hsession, pchar(AUrl), nil, 0, INTERNET_FLAG_RELOAD, 0);
+      if not Assigned(hRequest) then
+        raise Exception.Create('Error opening request: ' + SysErrorMessage(GetLastError));
+      try
+        StatusCode := GetStatusCode(hRequest);
+        if (StatusCode >= 300) and (StatusCode < 400) then
+        begin
+          Inc(RedirectCount);
+
+          // Stop following redirects if we exceed the maximum number of allowed redirects.
+          if RedirectCount > MaxRedirects then
+          begin
+            raise Exception.Create('Error: Too many redirects');
+          end;
+
+          // Get the "Location" header for the new URL
+          AURL := GetRedirectLocation(hRequest);
+        end
+        else if (StatusCode = 200) then // do not localize
+        begin
+          dwNumber := 1024;
+          while (InternetReadfile(hRequest, @databuffer, dwNumber, DwRead)) do
+          begin
+            if dwRead =0 then
+              break;
+            databuffer[dwread]:=#0;
+            Str := pansichar(@databuffer);
+            Response := Response + Str;
+          end;
+
+          // Output the server response.
+          Result := Response;
+
+          break;
+        end
+        else
+          raise Exception.CreateFmt('HTTP Error %d with GET request %s', [StatusCode, aurl]);
+      finally
+        InternetCloseHandle(hRequest);
+      end;
+    end;
+  finally
+    InternetCloseHandle(hsession);
+  end;
 end;
 
 function GetTempDir: string;
@@ -589,7 +628,7 @@ begin
 
       doRetry := false;
 
-      sJSON := GetPage(url);
+      sJSON := WinInet_DoGet(url);
 
       xRoot := TlkJSON.ParseText(sJSON) as TlkJSONobject;
       if not assigned(xRoot) then raise EVtsCurConvException.Create(S_JSON_FILE_INVALID);

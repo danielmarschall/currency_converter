@@ -50,6 +50,7 @@ var
   P: PChar;
   Len: Integer;
 begin
+  UniqueString(S); // because other strings could share the memory of this string
   Len := Length(S);
   if Len > 0 then
   begin
